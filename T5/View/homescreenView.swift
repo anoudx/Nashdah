@@ -14,7 +14,7 @@ struct homescreenView: View {
                             .frame(width: 45.0)
                     }
                     Spacer()
-                    
+                    //
                     Text("مرحبًا بك")
                         .font(.title)
                         .foregroundColor(Color("C1"))

@@ -11,7 +11,9 @@ import SwiftUI
 struct T5App: App {
     var body: some Scene {
         WindowGroup {
-            homescreenView()
+           // homescreenView()
+          //  SplashView()
+            RegistrationView()
         }
     }
 }
