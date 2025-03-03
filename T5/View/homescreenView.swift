@@ -8,10 +8,11 @@ struct homescreenView: View {
         NavigationStack{
             VStack{
                 HStack {
-                    Image(systemName: "heart.fill")
-                        .foregroundColor(Color("C1"))
-                        .frame(width: 45.0)
-                    
+                    NavigationLink(destination: Likes()){
+                        Image(systemName: "heart.fill")
+                            .foregroundColor(Color("C1"))
+                            .frame(width: 45.0)
+                    }
                     Spacer()
                     
                     Text("مرحبًا بك")
@@ -242,7 +243,7 @@ struct homescreenView: View {
                 }
             }
 
-        }
+        }.navigationBarBackButtonHidden(true)
         VStack {
             Spacer()
             HStack {
