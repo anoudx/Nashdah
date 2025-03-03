@@ -9,7 +9,7 @@
 import SwiftUI
 
 struct Profile: View {
-    @State private var name = " عبير العلي"
+    @State private var name = " عبير"
     @State private var isEditing = false
     
     var body: some View {

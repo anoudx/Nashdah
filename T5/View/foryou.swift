@@ -6,11 +6,11 @@
 //
 import SwiftUI
 
-struct myplaces: View {
+struct foryou: View {
     @State private var likedPlaces: [Int: Bool] = [:]
     
     var body: some View {
-        NavigationView {
+        NavigationStack {
             VStack {
                 ScrollView(.vertical, showsIndicators: false) {
                     VStack(spacing: 15) {
@@ -62,5 +62,5 @@ struct myplaces: View {
 }
 
 #Preview {
-    myplaces()
+    foryou()
 }

@@ -13,7 +13,7 @@ struct T5App: App {
         WindowGroup {
            // homescreenView()
           //  SplashView()
-            RegistrationView()
+            ContentView()
         }
     }
 }

@@ -243,66 +243,68 @@ struct homescreenView: View {
                 }
             }
 
-        }.navigationBarBackButtonHidden(true)
-        VStack {
-            Spacer()
-            HStack {
-                Spacer()
-                Button(action: {
-                   
-                }) {
-                    VStack{
-                        Image(systemName: "house.fill")
-                            .foregroundColor(.gray)
-                           
-                        
-                        Text("الرئيسية")
-                            .font(.caption)
-                            .fontWeight(.regular)
-                            .foregroundColor(.gray)
-                    }
-                }
-                Spacer()
-
-     
-                Button(action: {
-
-                }) {
-                    VStack{
-                        Image(.image)
-                            .resizable()
-                            .frame(width: 22, height: 22)
-                            .foregroundColor(.gray)
-                        
-                        Text("توصيات لك")
-                            .font(.caption)
-                            .fontWeight(.regular)
-                            .foregroundColor(.gray)
-                    }
-                   
-                }
-                Spacer()
-
-
-                Button(action: {
-             
-                }) {
-                   VStack{
-                       Image(systemName: "person.fill")
-                           .foregroundColor(.gray)
-                       
-                       Text("الحساب")
-                           .font(.caption)
-                           .fontWeight(.regular)
-                           .foregroundColor(.gray)
-                       
-                    }
-                }
-                Spacer()
-            }
-           
-        }.frame(height: 30)
+        }
+        .navigationBarBackButtonHidden(true)
+//        VStack {
+//            Spacer()
+//            HStack {
+//                Spacer()
+//                Button(action: {
+//                   
+//                }) {
+//                    VStack{
+//                        Image(systemName: "house.fill")
+//                            .foregroundColor(.gray)
+//                           
+//                        
+//                        Text("الرئيسية")
+//                            .font(.caption)
+//                            .fontWeight(.regular)
+//                            .foregroundColor(.gray)
+//                    }
+//                }
+//                Spacer()
+//
+//                NavigationLink(destination: foryou()){
+////                Button(action: {
+////
+////                }) {
+//                    VStack{
+//                        Image(.image)
+//                            .resizable()
+//                            .frame(width: 22, height: 22)
+//                            .foregroundColor(.gray)
+//                        
+//                        Text("توصيات لك")
+//                            .font(.caption)
+//                            .fontWeight(.regular)
+//                            .foregroundColor(.gray)
+//                    }
+//                   
+//                }
+//                Spacer()
+//  
+//                NavigationLink(destination: Profile()){
+////                Button(action: {
+////
+////                }) {
+//                    VStack{
+//                        Image(systemName: "person.fill")
+//                            .foregroundColor(.gray)
+//                        
+//                        Text("الحساب")
+//                            .font(.caption)
+//                            .fontWeight(.regular)
+//                            .foregroundColor(.gray)
+//                        
+//                    }
+//                }
+//                Spacer()
+//            }
+//           
+//        }.frame(height: 30)
     }
+     
 }
 
 #Preview {
