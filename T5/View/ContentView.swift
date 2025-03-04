@@ -9,11 +9,31 @@ import SwiftUI
 
 struct ContentView: View {
     var body: some View {
-        NavigationStack{
+        TabView {
+            homescreenView()
+                .tabItem {
+                    Image(systemName: "house.fill")
+                    Text("الرئيسية")
+                }
             
-            BarView()
+            foryou()
+                .tabItem {
+                    Image("Image")
+                     .resizable()
+//                        .renderingMode(.template)
+                        .frame(width: 22, height: 22)
+                    Text("توصيات لك")
+                }
+            
+            Profile()
+                .tabItem {
+           Image(systemName: "person.fill")
+                    Text("الحساب")
+                }
+
         }
 
+        .accentColor(Color("C1"))
     }
 }
 
