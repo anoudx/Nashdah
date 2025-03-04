@@ -1,7 +1,7 @@
 {
   "images" : [
     {
-      "filename" : "icon_tiny.png",
+      "filename" : "IMG_0597.jpg",
       "idiom" : "universal",
       "scale" : "1x"
     },
@@ -17,9 +17,5 @@
   "info" : {
     "author" : "xcode",
     "version" : 1
-  },
-  "properties" : {
-    "preserves-vector-representation" : true,
-    "template-rendering-intent" : "template"
   }
 }
