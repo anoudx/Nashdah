@@ -2,7 +2,7 @@ import SwiftUI
 
 struct homescreenView: View {
     @StateObject private var viewModel = homescreenViewModel()
-
+    
     var body: some View {
         NavigationStack {
             VStack {
@@ -18,46 +18,75 @@ struct homescreenView: View {
                         .foregroundColor(Color("C1"))
                         .padding()
                 }
-
+                
                 Divider()
                     .frame(height: 1)
                     .background(Color.gray.opacity(0.1))
-
+                
+                
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 15) {
-                        ForEach(0..<2) { _ in
+                        // المكان الأول
+                        ZStack {
                             Image("basat")
                                 .resizable()
                                 .scaledToFill()
                                 .frame(width: 300, height: 150)
                                 .clipShape(RoundedRectangle(cornerRadius: 20))
                                 .shadow(radius: 5)
-                                .overlay(
-                                    VStack(alignment: .trailing) {
-                                        Text("في مجلس بساط دايم تسمع ")
-                                            .font(.headline)
-                                            .foregroundColor(.white)
-                                            .shadow(radius: 3)
-                                            .padding(.top, 60.0)
-                                            .padding(.trailing, 75.0)
-                                        
-                                        Text("\"ترا البساط احمدي\"")
-                                            .font(.headline)
-                                            .foregroundColor(.white)
-                                            .bold()
-                                            .shadow(radius: 3)
-                                            .padding(.trailing, 100.0)
-                                    }
-                                    .padding()
-                                )
+                            
+                            VStack(alignment: .trailing) {
+                                Text("في مجلس بساط دايم تسمع")
+                                    .font(.headline)
+                                    .foregroundColor(.white)
+                                    .shadow(radius: 3)
+                                    .padding(.top, 50)
+                                    .padding(.trailing, 50)
+                                
+                                Text("\"ترا البساط احمدي\"")
+                                    .font(.headline)
+                                    .foregroundColor(.white)
+                                    .bold()
+                                    .shadow(radius: 3)
+                                    .padding(.trailing, 50)
+                            }
+                            .padding()
                         }
-                    }
-                    .padding(.trailing, 20)
-                    .frame(height: 150)
+                        
+                        // المكان الثاني
+                        ZStack {
+                            Image("IMG_0632")
+                                .resizable()
+                                .scaledToFill()
+                                .frame(width: 300, height: 150)
+                                .clipShape(RoundedRectangle(cornerRadius: 20))
+                                .shadow(radius: 5)
+                            
+                            VStack(alignment: .trailing) {
+                                Text("\"اللوحة الحُلُم\"")
+                                    .font(.headline)
+                                    .foregroundColor(.white)
+                                    .shadow(radius: 3)
+                                    .padding(.top, 50)
+                                    .padding(.trailing, 20)
+                                
+                                Text("وثبة الحياة")
+                                    .font(.headline)
+                                    .foregroundColor(.white)
+                                    .bold()
+                                    .shadow(radius: 3)
+                                    .padding(.trailing, 30)
+                            }
+                            .padding()
                 }
-                .environment(\.layoutDirection, .rightToLeft)
-                .padding()
-
+                
+            }
+            .padding(.trailing, 20)
+            .frame(height: 150)
+        }
+        .environment(\.layoutDirection, .rightToLeft)
+        .padding()
+    
                 // ✅ أزرار التصنيفات
                 HStack(spacing: 35) {
                     ForEach(["مكتبات", "منتزهات", "قهوة", "مطاعم", "الكل"], id: \.self) { category in
@@ -95,7 +124,8 @@ struct homescreenView: View {
                                         Text(place.name ?? "اسم غير معروف")
                                             .font(.headline)
                                             .fontWeight(.regular)
-                                            .padding(.leading, 100)
+                                          //  .padding(.leading, 50)
+                                            .frame(maxWidth: 190, alignment: .trailing)
                                   
                                             
                                         
@@ -103,9 +133,19 @@ struct homescreenView: View {
                                             .font(.caption)
                                             .fontWeight(.regular)
                                             .foregroundColor(Color.gray)
-                                            .padding(.leading, 20)
-                                            .frame(width: 200)
+                                            .frame(maxWidth: 180, alignment: .trailing)
                                             .multilineTextAlignment(.trailing)
+                                            .lineLimit(nil)
+                                        
+                                        
+                                        HStack{
+                                            Text(place.location ?? "مكان غير متاح")
+                                                .font(.caption)
+                                                .fontWeight(.regular)
+                                               
+                                            Image(systemName: "mappin.and.ellipse")
+                                                .frame(width:12)
+                                        } .frame(maxWidth: 190, alignment: .trailing)
                                     }
                                 }
                             }
@@ -117,6 +157,7 @@ struct homescreenView: View {
         }
     }
 }
+
 
 //        VStack {
 //            Spacer()

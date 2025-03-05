@@ -6,11 +6,15 @@ struct PlaceData: Codable {
     let category: String
     let descriptionText: String
     let imageName: String
+    let location: String
 }
 
 class DataManager {
     
     static let shared = DataManager()
+
+    let context = PersistenceController.shared.container.viewContext
+
     func clearPlacesData() {
         let fetchRequest: NSFetchRequest<NSFetchRequestResult> = Place.fetchRequest()
         let deleteRequest = NSBatchDeleteRequest(fetchRequest: fetchRequest)
@@ -23,9 +27,6 @@ class DataManager {
             print("❌ خطأ في حذف الأماكن: \(error)")
         }
     }
-
-    // ✅ استخدام Core Data من `PersistenceController`
-    let context = PersistenceController.shared.container.viewContext
 
     func isDataAlreadyInserted() -> Bool {
         let request: NSFetchRequest<Place> = Place.fetchRequest()
@@ -54,6 +55,8 @@ class DataManager {
                 newPlace.category = place.category
                 newPlace.descriptionText = place.descriptionText
                 newPlace.image = loadImage(named: place.imageName)
+                newPlace.location = place.location // ✅ تخزين الموقع
+                
             }
 
             try context.save()
@@ -90,5 +93,7 @@ class DataManager {
             print("❌ خطأ في جلب البيانات: \(error)")
             return []
         }
+    
+   
     }
 }

@@ -3,27 +3,95 @@
     "name": "سليب |slip",
     "category": "قهوة",
     "descriptionText": "قهوة لذيذة، مكان هادئ☕️",
-    "imageName": "slip.jpg"
+    "imageName": "slip.jpg",
+    "location": "القدس"
+
   },
   {
     "name": "مكتبة سلوى",
     "category": "مكتبات",
     "descriptionText": "مكتبة للكتب الجديدة والمستعملة 📚",
-    "imageName": "salwa.jpg"
+    "imageName": "salwa.jpg",
+    "location": "صلاح الدين"
   },
   {
     "name": "كباب البلقان",
     "category": "مطاعم",
     "descriptionText": "تذوقو الاصناف البلقانية في اجواء مميزة 🇧🇦",
-    "imageName": "balkan.jpg"
+    "imageName": "balkan.jpg",
+    "location": "الياسمين"
+    
   },
   {
     "name": "مطعم رامن",
     "category": "مطاعم",
     "descriptionText": "مطعم كوري و ياباني🍱",
-    "imageName": "ramen.jpg"
-  }
+    "imageName": "ramen.jpg",
+    "location": "العقيق"
+  },
+  {
+    "name": "BRU cafe|مقهى برو",
+    "category": "قهوة",
+    "descriptionText": "قهوة مُختصه وأكثر☕💻",
+    "imageName": "bru.jpg",
+    "location": "القدس"
+  },
+  
+  {
+    "name": "وادي الرياض الخضراء",
+    "category": "منتزهات",
+    "descriptionText":  "واحة خضراء مثالية للاسترخاء والتنزه🌿",
+    "imageName": "green.jpg",
+    "location": "الزهرة"
+  },
+  
+  {
+    "name": "Ovun Bistro|أوفن بيسترو",
+    "category": "مطاعم",
+    "descriptionText":  "تجربة طعام نابضة بالحياة تثير إحساسًا بالدهشة 🍽️",
+    "imageName": "ovun.jpg",
+    "location": "السليمانية"
+  },
+  
+  {
+    "name": "BRGR1983",
+    "category": "مطاعم",
+    "descriptionText":  " نكهة تُغيّر يومك🍔",
+    "imageName": "brgr1983.jpg",
+    "location": "الياسمين"
+  },
+  
+  {
+    "name": "the door",
+    "category": "مطاعم",
+    "descriptionText":  "مطعمك السري اللذيذ! 🍽️🤫",
+    "imageName": "thedoor.jpg",
+    "location": "غرناطة"
+  },
+  
+  {
+    "name": "الكنغر الذهبي",
+    "category": "قهوة",
+    "descriptionText":   "نكهة أسترالية فريدة بأسلوب لا مثيل له في السعودية☕️",
+    "imageName": "golden.jpg",
+    "location": "الريان"
+  },
+  
+  {
+    "name": "قهوة عصفورة",
+    "category": "قهوة",
+    "descriptionText":   "☕️🫖",
+    "imageName": "asfoura.jpg",
+    "location": "الملقا"
+  },
+  
+  {
+    "name": "المكتبة التراثية",
+    "category": "مكتبات",
+    "descriptionText": "وجهة ثقافية في الرياض تضم كنوزًا معرفية لمحبي القراءة والاستكشاف📚",
+    "imageName": "old.jpg",
+    "location": "حي الملك سلمان"
+  },
   
   ]
-
 
