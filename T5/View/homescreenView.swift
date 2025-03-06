@@ -87,7 +87,6 @@ struct homescreenView: View {
         .environment(\.layoutDirection, .rightToLeft)
         .padding()
     
-                // ✅ أزرار التصنيفات
                 HStack(spacing: 35) {
                     ForEach(["مكتبات", "منتزهات", "قهوة", "مطاعم", "الكل"], id: \.self) { category in
                         Text(category)
