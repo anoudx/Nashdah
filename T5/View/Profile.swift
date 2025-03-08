@@ -33,7 +33,8 @@ struct Profile: View {
                 Text("mood231@gmail.com")
                     .font(.system(size: 12))
 //                    .foregroundColor(.gray)
-                
+                    .accentColor(.gray)
+
                 
                 Button(action: {
                     isEditing.toggle()
