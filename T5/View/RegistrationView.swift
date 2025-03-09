@@ -11,17 +11,21 @@ import CloudKit
 struct RegistrationView: View {
     @State private var email = ""
     @State private var password = ""
-    @State private var confirmPassword = ""
     @State private var fullName = ""
     @State private var errorMessage = ""
     @State private var successMessage = ""
+    @State private var isAuthenticated = false // للانتقال إلى الصفحة الرئيسية بعد التسجيل
 
     var body: some View {
         VStack {
-            Image("logo").resizable().frame(width: 182.0, height: 187.0).scaledToFit()
+            Image("logo")
+                .resizable()
+                .frame(width: 182.0, height: 187.0)
+                .scaledToFit()
+            
             Text("تسجيل جديد")
                 .font(.system(size: 21))
-                .padding(.trailing,220)
+                .padding(.trailing, 220)
 
             TextField("الاسم الكامل", text: $fullName)
                 .textFieldStyle(RoundedBorderTextFieldStyle())
@@ -34,8 +38,6 @@ struct RegistrationView: View {
             SecureField("كلمة المرور", text: $password)
                 .textFieldStyle(RoundedBorderTextFieldStyle())
                 .padding()
-
-       
 
             if !errorMessage.isEmpty {
                 Text(errorMessage)
@@ -50,9 +52,8 @@ struct RegistrationView: View {
             }
 
             Button(action: {
-              
-                    registerUser(email: email, fullName: fullName, password: password)
-          }) {
+                registerUser(email: email, fullName: fullName, password: password)
+            }) {
                 Text("تسجيل")
                     .foregroundColor(.black)
                     .padding()
@@ -61,8 +62,14 @@ struct RegistrationView: View {
                     .cornerRadius(18)
             }
             .padding()
+            
+            // رابط للانتقال إلى صفحة تسجيل الدخول
+            NavigationLink(destination: Login(), isActive: $isAuthenticated) {
+                EmptyView()
+            }
         }
-        .padding().environment(\.layoutDirection, .rightToLeft)
+        .padding()
+        .environment(\.layoutDirection, .rightToLeft)
     }
 
     func registerUser(email: String, fullName: String, password: String) {
@@ -82,6 +89,7 @@ struct RegistrationView: View {
 
             DispatchQueue.main.async {
                 self.successMessage = "تم إنشاء الحساب بنجاح!"
+                self.isAuthenticated = true // الانتقال إلى الصفحة الرئيسية
             }
         }
     }

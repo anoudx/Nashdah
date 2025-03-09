@@ -22,7 +22,7 @@ struct SplashView: View {
                 }
                 
             }.ignoresSafeArea() .navigationDestination(isPresented: $isActive){
-                homescreenView()}  .onAppear {
+                Login()}  .onAppear {
                     DispatchQueue.main.asyncAfter(deadline: .now() + 5){
                         isActive = true
                     }

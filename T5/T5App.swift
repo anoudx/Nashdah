@@ -61,7 +61,7 @@ struct T5App: App {
 
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            Login()
                 .environment(\.managedObjectContext, persistenceController.container.viewContext)
         }
     }

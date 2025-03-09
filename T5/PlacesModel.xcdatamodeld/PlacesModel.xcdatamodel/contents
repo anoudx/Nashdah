@@ -4,7 +4,13 @@
         <attribute name="category" optional="YES" attributeType="String"/>
         <attribute name="descriptionText" optional="YES" attributeType="String"/>
         <attribute name="image" optional="YES" attributeType="Binary"/>
+        <attribute name="key" optional="YES" attributeType="String"/>
         <attribute name="location" optional="YES" attributeType="String"/>
         <attribute name="name" optional="YES" attributeType="String"/>
+    </entity>
+    <entity name="Rating" representedClassName="Rating" syncable="YES" codeGenerationType="class">
+        <attribute name="placeID" optional="YES" attributeType="String"/>
+        <attribute name="rating" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="userID" optional="YES" attributeType="String"/>
     </entity>
 </model>

@@ -12,9 +12,8 @@ struct Login: View {
     @State private var email = ""
     @State private var password = ""
     @State private var errorMessage = ""
-    @State private var isAuthenticated = false
-    @State private var showRegistration = false
-    
+    @State private var isAuthenticated = false // للانتقال إلى الصفحة الرئيسية بعد تسجيل الدخول
+
     var body: some View {
         NavigationView {
             VStack {
@@ -51,36 +50,21 @@ struct Login: View {
                 }
                 .padding()
 
-               
-                HStack {
-                    Text("ليس لديك حساب؟ ")
-                        .font(.body)
-                        .foregroundColor(.black)
-                    
-                    Text("إنشاء حساب جديد")
+                // رابط للانتقال إلى صفحة التسجيل
+                NavigationLink(destination: RegistrationView()) {
+                    Text("ليس لديك حساب؟ إنشاء حساب جديد")
                         .font(.body)
                         .foregroundColor(Color("C1"))
-                        .onTapGesture {
-                                                        self.showRegistration = true
-                        }
                 }
                 
-                NavigationLink(
-                    destination: RegistrationView(),
-                    isActive: $showRegistration
-                ) {
-                    EmptyView()
-                }
-
-                               NavigationLink(
-                    destination: Text("تم تسجيل الدخول بنجاح"),
-                    isActive: $isAuthenticated
-                ) {
+                // رابط للانتقال إلى الصفحة الرئيسية بعد تسجيل الدخول
+                NavigationLink(destination: ContentView(), isActive: $isAuthenticated) {
                     EmptyView()
                 }
             }
-            .padding()  .environment(\.layoutDirection, .rightToLeft)
-        }
+            .padding()
+            .environment(\.layoutDirection, .rightToLeft)
+        }.navigationBarBackButtonHidden(true)
     }
     
     func loginUser(email: String, password: String) {
@@ -98,7 +82,7 @@ struct Login: View {
             
             if let results = results, !results.isEmpty {
                 DispatchQueue.main.async {
-                    self.isAuthenticated = true
+                    self.isAuthenticated = true // الانتقال إلى الصفحة الرئيسية
                 }
             } else {
                 DispatchQueue.main.async {

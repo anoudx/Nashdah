@@ -2,6 +2,8 @@ import CoreData
 import UIKit
 
 struct PlaceData: Codable {
+    let id: String
+    let key: String
     let name: String
     let category: String
     let descriptionText: String
