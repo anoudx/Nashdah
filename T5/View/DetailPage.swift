@@ -176,7 +176,7 @@ struct DetailPage: View {
     
     struct DetailPage_Previews: PreviewProvider {
         static var previews: some View {
-            DetailPage(place: Place2(id: "1", key: "11", name: "سليب |slip", descriptionText: "قهوة لذيذة، مكان هادئ☕️", category: "قهوة",imageName: "slip"))
+            DetailPage(place: Place2(id: "1", key: "11", name: "سليب |slip", descriptionText: "قهوة لذيذة، مكان هادئ☕️", category: "قهوة",imageName: "slip" ,location:  "" ))
         }
     }
 }

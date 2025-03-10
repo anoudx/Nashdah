@@ -326,7 +326,8 @@ struct Place2: Identifiable, Codable {
     let descriptionText: String // وصف المكان
     let category: String // التصنيف (مثل "قهوة"، "مطاعم"، إلخ)
     var imageName: String?
-  
+    let location: String
+
 }
 func loadPlacesFromJSON() -> [Place2] {
     guard let url = Bundle.main.url(forResource: "places", withExtension: "json") else {

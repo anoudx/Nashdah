@@ -63,6 +63,8 @@ struct T5App: App {
         WindowGroup {
             SplashView()
                 .environment(\.managedObjectContext, persistenceController.container.viewContext)
+                .environment(\.font, Font.custom("SF Arabic", size: 18)) 
+
         }
     }
 }
