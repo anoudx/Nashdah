@@ -7,12 +7,17 @@
 
 
 import SwiftUI
+import CloudKit
 
 struct Profile: View {
-    @State private var name = " عبير"
+    @State private var userEmail = ""
+    @State private var userName = ""
     @State private var isEditing = false
+    
     @AppStorage("isLoggedIn") private var isLoggedIn: Bool = false // ✅ تحديد هل المستخدم مسجل أم لا
     
+    @AppStorage("userEmail") private var storedEmail: String = ""  // edit
+
     var body: some View {
         NavigationView {
             VStack(spacing: 15) {
@@ -22,21 +27,20 @@ struct Profile: View {
                     .foregroundColor(.gray)
                 
                 if isEditing {
-                    TextField("أدخل الاسم", text: $name)
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
-                        .frame(width: 200)
-                } else {
-                    Text(name)
-                        .font(.custom(".system", size: 22))
-                        .fontWeight(.semibold)
-                }
-                
-                Text("mood231@gmail.com")
-                    .font(.system(size: 12))
-                //                    .foregroundColor(.gray)
-                    .accentColor(.gray)
-                
-                
+                   TextField("أدخل الاسم", text: $userName)
+                   .textFieldStyle(RoundedBorderTextFieldStyle())
+                   .frame(width: 200)
+                       } else {
+                         Text(userName)
+                         .font(.custom("SFPro", size: 22))
+                         .fontWeight(.semibold)
+                                              }
+                               
+                               Text(userEmail)
+                               .font(.custom("SFPro", size: 12))
+                               .foregroundColor(.gray)
+
+                   
                 Button(action: {
                     isEditing.toggle()
                 }) {
@@ -52,19 +56,109 @@ struct Profile: View {
                 Spacer()
                     .frame(height: 30)
                 
+                NavigationLink(destination: Likes(likedPlaces: .constant([]))) {
+                                    HStack{
+                                        Image(systemName: "chevron.left")
+                                            .foregroundColor(.gray)
+                                            .frame(maxWidth:.infinity, alignment: .leading)
+                                        Spacer()
+                                        
+                                        Text("الأماكن المفضلة")
+                                            .font(.custom("SFPro", size: 18))
+                                            .foregroundColor(.black)
+                                            .frame(maxWidth:.infinity, alignment: .trailing)
+                                        
+                                        
+                                    }
+                                    .padding()
+                                    
+                                    .frame(width: 322, height: 52)
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius:10)
+                                            .stroke(Color("C2"), lineWidth: 1.5))
+                                }
                 
-                ExpandableSection(title: "من نحن",  content: "نكتب المحتوى هنا")
-                ExpandableSection(title: "شاركنا رحلتنا", content: "نكتب المحتوى هنا")
-                
-                Spacer()
-            }
-            .padding(.top, 60)
+                ExpandableSection(title: "من نحن", content: "نأخذك في رحلة لاكتشاف أجمل الأماكن السياحية الفريدة وغير المعروفة في السعودية، بعيداً عن الوجهات التقليدية. استعد لتجربة مميزة واستكشاف جديد في كل رحلة لتحقيق مغامرات لا تُنسى!")
+                Button(action: {
+                                   logout()
+                               }) {
+                                   Text("تسجيل الخروج")
+                                       .font(.custom("SFPro", size: 18))
+                                       .foregroundColor(.red)
+                                       .frame(width: 300, height:25)
+                                       .padding()
+                                       .overlay(
+                                           RoundedRectangle(cornerRadius: 10)
+                                               .stroke(Color.red, lineWidth: 1.5)
+                                       )
+                               }
+                               .padding(.top, 80)
+                               
+                               Spacer()
+                           }
+                           .padding(.top, 60)
             
-        } .fullScreenCover(isPresented: .constant(!isLoggedIn)) { // ✅ إذا لم يكن مسجلًا، انتقل إلى `LoginView`
+        }
+        .onAppear {
+            if !isLoggedIn {
+                DispatchQueue.main.async {
+                    UIApplication.shared.windows.first?.rootViewController = UIHostingController(rootView: Login())
+                    UIApplication.shared.windows.first?.makeKeyAndVisible()
+                }
+            } else {
+                fetchUserData() // تحميل بيانات المستخدم عند الدخول للملف الشخصي
+            }
+        }
+        .fullScreenCover(isPresented: .constant(!isLoggedIn)) { // ✅ إذا لم يكن مسجلًا، انتقل إلى `LoginView`
             Login()
         }
     }
     
+    //  دالة لجلب بيانات المستخدم من CloudKit
+       func fetchUserData() {
+           guard let storedEmail = UserDefaults.standard.string(forKey: "userEmail") else {
+               return
+           }
+
+           let predicate = NSPredicate(format: "email == %@", storedEmail)
+           let query = CKQuery(recordType: "User", predicate: predicate)
+
+           let database = CKContainer.default().publicCloudDatabase
+           database.perform(query, inZoneWith: nil) { results, error in
+               if let error = error {
+                   print("❌ خطأ أثناء جلب البيانات: \(error.localizedDescription)")
+                   return
+               }
+
+               if let results = results, let record = results.first {
+                   DispatchQueue.main.async {
+                       self.userEmail = record["email"] as? String ?? ""
+                       self.userName = record["fullName"] as? String ?? "مستخدم مجهول"
+                   }
+               }
+           }
+       }
+
+       func logout() {
+           storedEmail = "" // delete email
+           userEmail = ""
+           userName = ""
+           isLoggedIn = false
+           UserDefaults.standard.set(false, forKey: "isAuthenticated")
+           
+           DispatchQueue.main.async {
+               if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+                  let window = windowScene.windows.first {
+                   window.rootViewController = UIHostingController(rootView: Login())
+                   window.makeKeyAndVisible()
+               }
+           }
+       }
+   }
+
+
+
+
     struct ExpandableSection: View {
         let title: String
         let  content: String
@@ -101,20 +195,26 @@ struct Profile: View {
                 }
                 
                 if isExpanded {
-                    Text(content)
-                        .font(.custom(".system", size: 16))
-                    //  هنا تنسيق المحتوى
-                    
-                }
-                
-            }// end vstack
+                                Text(content)
+                                    .font(.custom("SFPro", size: 16))
+                                    .multilineTextAlignment(.trailing)
+                                    .padding(.horizontal)
+                                .padding(.bottom,10)}}
+                                .foregroundColor(.gray)
+
+                                    .frame(width:322)
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 10)
+                                            .stroke(Color("C2"), lineWidth: 1.5)
+                                    )
+
+                            }
+                            
+                        }// end vstack
             
-        }
-    }
     
-    struct Profile_Previews: PreviewProvider {
-        static var previews: some View {
-            Profile()
-        }
+struct Profile_Previews: PreviewProvider {
+    static var previews: some View {
+        Profile()
     }
 }

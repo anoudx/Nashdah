@@ -14,6 +14,9 @@ struct Login: View {
     @State private var errorMessage = ""
     @State private var isAuthenticated = false // للانتقال إلى الصفحة الرئيسية بعد تسجيل الدخول
     @State private var navigateToHome = false // ✅ متغير التحكم بالتخطي
+   
+    @AppStorage("userEmail") private var storedEmail: String = ""  // edit
+    @AppStorage("isLoggedIn") private var isLoggedIn: Bool = false // ✅ تحديد هل المستخدم مسجل أم لا
 
     var body: some View {
         NavigationView {
@@ -97,6 +100,8 @@ struct Login: View {
             if let results = results, !results.isEmpty {
                 DispatchQueue.main.async {
                     self.isAuthenticated = true // الانتقال إلى الصفحة الرئيسية
+                    self.storedEmail = email // edit
+                    self.isLoggedIn = true // edit
                 }
             } else {
                 DispatchQueue.main.async {
