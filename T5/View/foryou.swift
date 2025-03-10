@@ -12,9 +12,9 @@ import Foundation
 struct foryou: View {
   
     @State private var places: [Place2] = []
+    @State private var likedPlaces: [Place2] = []
     @State private var recommendedCategories: [String] = []
-    @State private var isHeartFilled = false
-
+    @State private var heartStates: [String: Bool] = [:]
     var body: some View {
         NavigationStack {
             VStack(spacing:12){
@@ -69,12 +69,16 @@ struct foryou: View {
                                     .padding(.leading)
                                     .padding(.trailing, 80)
                                     
-                                    Image(systemName: isHeartFilled ? "heart.fill" : "heart")
-                                        .padding(.leading, 60)
-                                        .padding(.bottom, 55.0)
-                                        .foregroundStyle(.white)
+                                    Image(systemName: heartStates[place.id ?? ""] == true ? "heart.fill" : "heart")
+                                        .resizable().scaledToFit().frame(width: 30, height: 30)
+                                            .padding(.leading, 50)
+                                            .padding(.bottom, 55.0)
+                                            .foregroundStyle(Color("C1"))
                                         .onTapGesture {
-                                            isHeartFilled.toggle()
+                                            Task {
+                                                                                         await toggleLike(place)
+                                                                                     }
+                                   
                                         }
                                 }
                             }
@@ -91,6 +95,7 @@ struct foryou: View {
         .onAppear {
             Task{
                 await loadPlacesAndRecommendations()
+                await loadLikedPlaces()
             }
         }
     }
@@ -98,6 +103,132 @@ struct foryou: View {
         places = await loadPlacesFromJSON()
         await loadRecommendations()
     }
+    private func loadLikedPlaces() async {
+        do {
+            // جلب معرف المستخدم
+            let userRecordID = try await fetchUserRecordID()
+            
+            // إنشاء استعلام لجلب الإعجابات
+            let predicate = NSPredicate(format: "userID == %@", userRecordID.recordName)
+            let query = CKQuery(recordType: "Likes", predicate: predicate)
+            
+            // تنفيذ الاستعلام
+            let database = CKContainer.default().publicCloudDatabase
+            let records = try await database.records(matching: query)
+            
+            // تحديث حالة القلب بناءً على النتائج
+            for result in records.matchResults {
+                if let record = try? result.1.get(),
+                   let placeID = record["placeID"] as? String {
+                    DispatchQueue.main.async {
+                        self.heartStates[placeID] = true
+                    }
+                }
+            }
+        } catch {
+            print("❌ خطأ في جلب الإعجابات: \(error.localizedDescription)")
+        }
+    }
+        
+    private func fetchLikedPlaceIDs() async -> [String] {
+        var likedPlaceIDs: [String] = []
+        let database = CKContainer.default().publicCloudDatabase
+        let predicate = NSPredicate(format: "userID == %@", "user123")
+        let query = CKQuery(recordType: "Likes", predicate: predicate)
+        
+        do {
+            let results = try await database.records(matching: query)
+            for result in results.matchResults {
+                if let record = try? result.1.get(),
+                   let placeID = record["placeID"] as? String {
+                    likedPlaceIDs.append(placeID)
+                }
+            }
+        } catch {
+            print("❌ خطأ في جلب الأماكن المفضلة: \(error.localizedDescription)")
+        }
+        
+        return likedPlaceIDs
+    }
+
+    private func toggleLike(_ place: Place2) async {
+        let currentState = heartStates[place.id ?? ""] ?? false
+        let newState = !currentState
+        
+        if newState {
+            await addLike(place)
+            DispatchQueue.main.async {
+                     self.likedPlaces.append(place) // إضافة المكان إلى القائمة
+                 }
+        } else {
+            await removeLike(place)
+            DispatchQueue.main.async {
+                   self.likedPlaces.removeAll { $0.id == place.id } // إزالة المكان من القائمة
+               }
+        }
+        
+        DispatchQueue.main.async {
+            self.heartStates[place.id ?? ""] = newState
+        }
+    }
+
+    private func addLike(_ place: Place2) async {
+        do {
+            let userRecordID = try await fetchUserRecordID()
+            let record = CKRecord(recordType: "Likes")
+            record["placeID"] = place.id
+            record["liked"] = true
+            record["userID"] = userRecordID.recordName
+            
+            let database = CKContainer.default().publicCloudDatabase
+            try await database.save(record)
+            print("✅ تم حفظ حالة الإعجاب بنجاح!")
+        } catch {
+            print("❌ خطأ في حفظ حالة الإعجاب: \(error.localizedDescription)")
+        }
+    }
+    private func fetchUserRecordID() async throws -> CKRecord.ID {
+        return try await withCheckedThrowingContinuation { continuation in
+            CKContainer.default().fetchUserRecordID { recordID, error in
+                if let error = error {
+                    continuation.resume(throwing: error)
+                } else if let recordID = recordID {
+                    continuation.resume(returning: recordID)
+                } else {
+                    continuation.resume(throwing: NSError(domain: "UnknownError", code: -1, userInfo: nil))
+                }
+            }
+        }
+    }
+    private func removeLike(_ place: Place2) async {
+        do {
+            let userRecordID = try await fetchUserRecordID()
+            let predicate = NSPredicate(format: "placeID == %@ AND userID == %@", place.id ?? "", userRecordID.recordName)
+            let query = CKQuery(recordType: "Likes", predicate: predicate)
+            
+            let database = CKContainer.default().publicCloudDatabase
+            let records = try await database.records(matching: query)
+            
+            for result in records.matchResults {
+                if let record = try? result.1.get() {
+                    try await database.deleteRecord(withID: record.recordID)
+                    print("✅ تم حذف الإعجاب بنجاح!")
+                }
+            }
+        } catch {
+            print("❌ خطأ في حذف الإعجاب: \(error.localizedDescription)")
+        }
+    }
+
+
+
+
+
+
+
+
+
+
     private func loadRecommendations() {
             guard let model = try? MyRecommender4(configuration: MLModelConfiguration()) else {
                 print("فشل تحميل النموذج")
