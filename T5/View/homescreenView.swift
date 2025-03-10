@@ -2,15 +2,16 @@ import SwiftUI
 
 struct homescreenView: View {
     @StateObject private var viewModel = homescreenViewModel()
-    
+    @State private var likedPlaces: [Place2] = []
     var body: some View {
         NavigationStack {
             VStack {
                 HStack {
-                    NavigationLink(destination: Likes()) {
+                    NavigationLink(destination: Likes(likedPlaces: $likedPlaces)) {
                         Image(systemName: "heart.fill")
-                            .foregroundColor(Color("C1"))
-                            .frame(width: 45.0)
+                            .resizable().scaledToFit().frame(width: 30, height: 30)
+                            .padding(.leading,20)
+                                .foregroundStyle(Color("C1"))
                     }
                     Spacer()
                     Text("مرحبًا بك")
