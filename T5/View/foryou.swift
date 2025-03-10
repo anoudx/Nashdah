@@ -15,6 +15,8 @@ struct foryou: View {
     @State private var likedPlaces: [Place2] = []
     @State private var recommendedCategories: [String] = []
     @State private var heartStates: [String: Bool] = [:]
+    @AppStorage("isLoggedIn") private var isLoggedIn: Bool = false //  التحقق من تسجيل الدخول
+
     var body: some View {
         NavigationStack {
             VStack(spacing:12){
@@ -24,69 +26,94 @@ struct foryou: View {
                 Divider()
                     .frame(height: 1)
                     .background(Color.gray.opacity(0.1))
-                
-                ScrollView(.vertical, showsIndicators: false) {
-                    
-                    ForEach(places.filter { recommendedCategories.contains($0.key) }, id: \.id) { place in
-                        NavigationLink(destination: DetailPage(place: place)) {
-                            ZStack (alignment: .leading){
-                                if let imageName = place.imageName,
-                                   let uiImage = UIImage(named: imageName) {  // تحميل الصورة من Assets باستخدام اسمها
-                                    Image(uiImage: uiImage)
-                                        .resizable()
-                                        .scaledToFill()
-                                        .frame(width: 359, height: 109)
-                                        .clipShape(RoundedRectangle(cornerRadius: 15))
-                                } else {
-                                    // في حال لم تكن الصورة موجودة، عرض صورة افتراضية
-                                    RoundedRectangle(cornerRadius: 15)
-                                        .fill(Color.gray)
-                                        .frame(width: 359, height: 109)
-                                }
-                                
-                                HStack {
-                                    ZStack(alignment: .leading) {
+                if isLoggedIn {
+                    ScrollView(.vertical, showsIndicators: false) {
+                        
+                        ForEach(places.filter { recommendedCategories.contains($0.key) }, id: \.id) { place in
+                            NavigationLink(destination: DetailPage(place: place)) {
+                                ZStack (alignment: .leading){
+                                    if let imageName = place.imageName,
+                                       let uiImage = UIImage(named: imageName) {  // تحميل الصورة من Assets باستخدام اسمها
+                                        Image(uiImage: uiImage)
+                                            .resizable()
+                                            .scaledToFill()
+                                            .frame(width: 359, height: 109)
+                                            .clipShape(RoundedRectangle(cornerRadius: 15))
+                                    } else {
+                                        // في حال لم تكن الصورة موجودة، عرض صورة افتراضية
                                         RoundedRectangle(cornerRadius: 15)
-                                            .fill(Color("GrayC"))
-                                            .frame(width: 143, height: 90)
-                                            .opacity(0.53)
-                                            .padding(.trailing, 20)
-                                        
-                                        VStack(alignment: .leading, spacing: 4) {
-                                            Text(place.name ?? "اسم غير معروف")
-                                                .font(.custom("SFPro", size: 16))
-                                                .foregroundColor(Color.black)
-                                                .frame(maxWidth: .infinity, alignment: .center)
-                                            
-                                            Text(place.descriptionText ?? "وصف غير متاح")
-                                                .font(.custom("SFPro", size: 11))
-                                                .foregroundColor(Color.black)
-                                                .frame(maxWidth: .infinity, alignment: .center)
-                                                .padding(.top, 5)
-                                        }
-                                        .frame(width: 140, height: 90) // تأكد النص داخل المربع
+                                            .fill(Color.gray)
+                                            .frame(width: 359, height: 109)
                                     }
-                                    .padding(.leading)
-                                    .padding(.trailing, 80)
                                     
-                                    Image(systemName: heartStates[place.id ?? ""] == true ? "heart.fill" : "heart")
-                                        .resizable().scaledToFit().frame(width: 30, height: 30)
+                                    HStack {
+                                        ZStack(alignment: .leading) {
+                                            RoundedRectangle(cornerRadius: 15)
+                                                .fill(Color("GrayC"))
+                                                .frame(width: 143, height: 90)
+                                                .opacity(0.53)
+                                                .padding(.trailing, 20)
+                                            
+                                            VStack(alignment: .leading, spacing: 4) {
+                                                Text(place.name ?? "اسم غير معروف")
+                                                    .font(.custom("SFPro", size: 16))
+                                                    .foregroundColor(Color.black)
+                                                    .frame(maxWidth: .infinity, alignment: .center)
+                                                
+                                                Text(place.descriptionText ?? "وصف غير متاح")
+                                                    .font(.custom("SFPro", size: 11))
+                                                    .foregroundColor(Color.black)
+                                                    .frame(maxWidth: .infinity, alignment: .center)
+                                                    .padding(.top, 5)
+                                            }
+                                            .frame(width: 140, height: 90) // تأكد النص داخل المربع
+                                        }
+                                        .padding(.leading)
+                                        .padding(.trailing, 80)
+                                        
+                                        Image(systemName: heartStates[place.id ?? ""] == true ? "heart.fill" : "heart")
+                                            .resizable().scaledToFit().frame(width: 30, height: 30)
                                             .padding(.leading, 50)
                                             .padding(.bottom, 55.0)
                                             .foregroundStyle(Color("C1"))
-                                        .onTapGesture {
-                                            Task {
-                                                                                         await toggleLike(place)
-                                                                                     }
-                                   
-                                        }
+                                            .onTapGesture {
+                                                Task {
+                                                    await toggleLike(place)
+                                                }
+                                                
+                                            }
+                                    }
                                 }
                             }
+                            .padding(.bottom, 9)
                         }
-                        .padding(.bottom, 9)
+                        
+                        
                     }
-
-
+                } else {
+                    // ✅ المستخدم غير مسجل، عرض اللوجو مع دعوة للتسجيل
+                    VStack() {
+                        Image("logo") // تأكدي من وجود صورة اللوجو في الـ Assets
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 150, height: 150)
+                            .padding(.top, 150)
+                        
+                        Text("وين ودك تروح؟")
+                            .font(.headline)
+                           
+                            .multilineTextAlignment(.center)
+                            .padding(.horizontal, 30)
+                        
+                        Text(" سجل وخلنا نقترح لك اماكن تناسبك")
+                            .font(.headline)
+                            .foregroundColor(.gray)
+                            .multilineTextAlignment(.center)
+                            .padding(.horizontal, 30)
+                        
+                            .padding(.bottom, 300)
+                        
+                    }
                 }
             }
         }

@@ -13,6 +13,7 @@ struct Login: View {
     @State private var password = ""
     @State private var errorMessage = ""
     @State private var isAuthenticated = false // للانتقال إلى الصفحة الرئيسية بعد تسجيل الدخول
+    @State private var navigateToHome = false // ✅ متغير التحكم بالتخطي
 
     var body: some View {
         NavigationView {
@@ -64,7 +65,20 @@ struct Login: View {
             }
             .padding()
             .environment(\.layoutDirection, .rightToLeft)
-        }.navigationBarBackButtonHidden(true)
+            .toolbar {
+                // ✅ إضافة زر التخطي
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button("تخطي") {
+                        navigateToHome = true
+                    }
+                    .foregroundColor(Color("C1"))
+                }
+            }
+            .fullScreenCover(isPresented: $navigateToHome) { // ✅ الانتقال للصفحة الرئيسية عند الضغط
+                ContentView()
+            }
+        }
+        .navigationBarBackButtonHidden(true)
     }
     
     func loginUser(email: String, password: String) {
@@ -98,4 +112,3 @@ struct ContentView_Previews: PreviewProvider {
         Login()
     }
 }
-
