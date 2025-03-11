@@ -1,9 +1,3 @@
-//
-//  DetailPage.swift
-//  T5
-//
-//  Created by Noura Alrowais on 03/09/1446 AH.
-//
 import SwiftUI
 import CloudKit
 import MapKit
@@ -14,11 +8,10 @@ struct Location: Identifiable {
 }
 
 struct DetailPage: View {
-    let location = Location(coordinate: CLLocationCoordinate2D(latitude: 24.7136, longitude: 46.6753)) // الموقع مؤقت
+    let location = Location(coordinate: CLLocationCoordinate2D(latitude: 24.7136, longitude: 46.6753))
     @State private var rating = 0
-    let place: Place2 // المكان المحدد
+    let place: Place2
     
-    // تعريف منطقة الخريطة
     @State private var region = MKCoordinateRegion(
         center: CLLocationCoordinate2D(latitude: 24.7136, longitude: 46.6753),
         span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)
@@ -76,67 +69,46 @@ struct DetailPage: View {
                     .padding(16)
                 }
                 
-                VStack {
-                    Text(place.name)
-                        .font(.system(size: 16))
-                        .fontWeight(.bold)
-                        .padding(.trailing, 60.0)
-                        .padding(.top, 20)
+                VStack(alignment: .trailing, spacing: 15) {
+                    
+                    
+                    
+                    Text(place.descriptionText)
+                        .foregroundColor(.gray)
+                        .multilineTextAlignment(.trailing)
+                        .padding()
+                    
+                    Divider()
+                        .padding(.horizontal)
                     
                     HStack {
-                        ForEach(1..<6) { index in
-                            Image(systemName: index <= rating ? "star.fill" : "star")
-                                .foregroundColor(index <= rating ? .yellow : .black)
-                                .onTapGesture {
-                                    rating = index // تحديث التقييم عند الضغط على النجمة
-                                    saveRating()
-                                }
-                        }
+                        Image(systemName: "mappin.and.ellipse")
+                            .foregroundColor(Color("C1"))
+                        
+                        Text("الموقع")
+                            .font(.title3)
+                      
                     }
-                    .padding(.top, 5)
+                    .padding(.top, 10)
+                    .frame(maxWidth: .infinity, alignment: .trailing)
+                    .padding(.horizontal)
+                    
+                    Map(coordinateRegion: $region, interactionModes: .all, annotationItems: [location]) { location in
+                        MapPin(coordinate: location.coordinate, tint: Color("C1"))
+                    }
+                    .frame(height: 180)
+                    .cornerRadius(15)
+                    .padding(.horizontal)
                 }
-                .padding(.top, 250)
-                .padding(.trailing, 230.0)
             }
-            
-            Text("وصف المكان")
-                .font(.system(size: 24))
-                .padding(.top, 50)
-                .padding(.trailing, 240.0)
-            
-            Text(place.descriptionText)
-                .foregroundColor(Color.gray)
-            
-            Text("الموقع")
-                .font(.system(size: 24))
-                .padding(.top, 20)
-                .padding(.trailing, 300.0)
-            
-            // استخدام Map مع المعاملات الصحيحة
-      
-            Map(coordinateRegion: $region, interactionModes: .all, annotationItems: [Location(coordinate: CLLocationCoordinate2D(latitude: place.coordinate.latitude, longitude: place.coordinate.longitude))]) { location in
-                MapPin(coordinate: location.coordinate, tint: Color("C1"))
-            }
-            .frame(height: 162.0)
-
-
-                     
-                     
-     
         }
-        .environment(\.layoutDirection, .rightToLeft)
+      //  .environment(\.layoutDirection, .rightToLeft)
         .onAppear {
-            fetchRating() // استرجاع التقييم عند تحميل الصفحة
-         
-            region.center = CLLocationCoordinate2D(latitude: place.coordinate.latitude, longitude: place.coordinate.longitude)
- // تحديث مركز الخريطة باستخدام الإحداثيات
-                     
-            
+            fetchRating()
         }
     }
     
     private func saveRating() {
-        // أولًا: جلب معرف المستخدم الفعلي
         CKContainer.default().fetchUserRecordID { userRecordID, error in
             if let error = error {
                 print("❌ خطأ في جلب معرف المستخدم: \(error.localizedDescription)")
@@ -147,13 +119,11 @@ struct DetailPage: View {
                 print("❌ لم يتم العثور على معرف المستخدم")
                 return
             }
-            print("❗️ محاولة استرجاع التقييم باستخدام placeID: \(place.id), userID: \(userRecordID.recordName)")
 
-            // ثانيًا: حفظ التقييم مع معرف المستخدم الفعلي
             let record = CKRecord(recordType: "Rating")
-            record["placeID"] = place.id // تأكد من أن place.id ليس nil
+            record["placeID"] = place.id
             record["rating"] = rating
-            record["userID"] = userRecordID.recordName // تأكد من حفظ userID بشكل صحيح
+            record["userID"] = userRecordID.recordName
 
             let database = CKContainer.default().publicCloudDatabase
             database.save(record) { savedRecord, error in
@@ -161,7 +131,6 @@ struct DetailPage: View {
                     print("❌ خطأ في حفظ التقييم: \(error.localizedDescription)")
                 } else {
                     print("✅ تم حفظ التقييم بنجاح!")
-                    print("✅ التقييم المحفوظ: \(rating)")
                 }
             }
         }
@@ -170,13 +139,11 @@ struct DetailPage: View {
     private func fetchRating() {
         let database = CKContainer.default().publicCloudDatabase
         
-        // تأكد من أن place.id يحتوي على قيمة صالحة
         guard let placeID = place.id else {
             print("❌ place.id هو nil")
             return
         }
 
-        // جلب معرف المستخدم
         CKContainer.default().fetchUserRecordID { userRecordID, error in
             if let error = error {
                 print("❌ خطأ في جلب معرف المستخدم: \(error.localizedDescription)")
@@ -188,7 +155,6 @@ struct DetailPage: View {
                 return
             }
 
-            // الاستعلام باستخدام placeID و userID
             let predicate = NSPredicate(format: "placeID == %@ AND userID == %@", placeID, userRecordID.recordName)
             let query = CKQuery(recordType: "Rating", predicate: predicate)
 
@@ -209,16 +175,33 @@ struct DetailPage: View {
             }
         }
     }
-
-
-
-
-
-    
-    
-//    struct DetailPage_Previews: PreviewProvider {
-//        static var previews: some View {
-//            DetailPage(place: Place2(id: "1", key: "11", name: "سليب |slip", descriptionText: "قهوة لذيذة، مكان هادئ☕️", category: "قهوة",imageName: "slip" ,location: " السعودية" ),coordinateSpace:  24.7136, 46.6753 )
-//        }
-//    }
 }
+
+// ✅ **تأثير BlurView لتطبيقه على الخلفيات**
+struct BlurView: UIViewRepresentable {
+    func makeUIView(context: Context) -> UIVisualEffectView {
+        let view = UIVisualEffectView(effect: UIBlurEffect(style: .systemUltraThinMaterialDark))
+        return view
+    }
+    
+    func updateUIView(_ uiView: UIVisualEffectView, context: Context) {}
+}
+
+
+    struct DetailPage_Previews: PreviewProvider {
+            static var previews: some View {
+                let place = Place2(
+                    id: "1",
+                    key: "11",
+                    name: "سليب |slip",
+                    descriptionText: "قهوة لذيذة، مكان هادئ☕️",
+                    category: "قهوة",
+                    imageName: "slip.jpg",
+                    location: "السعودية",
+                    coordinate: Place2.Coordinate(latitude: 24.7455313, longitude: 46.7530438)
+                )
+                
+                return DetailPage(place: place)
+                    .previewLayout(.sizeThatFits)
+            }
+        }

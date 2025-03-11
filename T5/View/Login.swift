@@ -30,11 +30,11 @@ struct Login: View {
                 
                 TextField("البريد الإلكتروني", text: $email)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
-                    .padding()
-                
+                    .padding(.horizontal,20)
+                    .padding(.bottom,8)
                 SecureField("كلمة المرور", text: $password)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
-                    .padding()
+                    .padding(.horizontal,20)
                 
                 if !errorMessage.isEmpty {
                     Text(errorMessage)
