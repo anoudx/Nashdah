@@ -8,13 +8,10 @@ import SwiftUI
 import CloudKit
 import MapKit
 
-// تعريف هيكل الموقع
 struct Location: Identifiable {
     let id = UUID()
     let coordinate: CLLocationCoordinate2D
 }
-
-
 
 struct DetailPage: View {
     let location = Location(coordinate: CLLocationCoordinate2D(latitude: 24.7136, longitude: 46.6753)) // الموقع مؤقت
@@ -28,19 +25,55 @@ struct DetailPage: View {
     )
     
     var body: some View {
-        VStack {
-            ZStack {
-                // هنا استخدم اسم الصورة من `place.image`
-                if let imageName = place.imageName, let uiImage = UIImage(named: imageName) {
-                    Image(uiImage: uiImage) // هنا نعرض الصورة من `Assets`
-                        .resizable()
-                        .frame(width: 400.0, height: 374.0)
-                        .scaledToFit()
-                } else {
-                    // في حال لم تكن الصورة موجودة، يمكن عرض صورة افتراضية
-                    RoundedRectangle(cornerRadius: 15)
-                        .fill(Color.gray)
-                        .frame(width: 400.0, height: 374.0)
+        ScrollView {
+            VStack {
+                ZStack(alignment: .bottomTrailing) {
+                    if let imageName = place.imageName, let uiImage = UIImage(named: imageName) {
+                        Image(uiImage: uiImage)
+                            .resizable()
+                            .scaledToFill()
+                            .frame(width: UIScreen.main.bounds.width, height: 300)
+                            .clipped()
+                    } else {
+                        RoundedRectangle(cornerRadius: 15)
+                            .fill(Color.gray)
+                            .frame(width: UIScreen.main.bounds.width, height: 300)
+                    }
+                    
+                    VStack(alignment: .trailing) {
+                        Text(place.name)
+                            .font(.headline)
+                           // .bold()
+                            .foregroundColor(.white)
+                            .padding(.bottom, 5)
+                        
+                        HStack(spacing: 8) { // ✅ تقليل المسافة بين النجوم لتبدو طبيعية أكثر
+                            ForEach(1..<6) { index in
+                                Image(systemName: index <= rating ? "star.fill" : "star")
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 18, height: 18) // ✅ تكبير النجوم قليلًا لجعلها أكثر بروزًا
+                                    .foregroundColor(index <= rating ? .yellow : .gray.opacity(0.5)) // ✅ تحسين وضوح النجوم غير المحددة
+                                    .scaleEffect(index == rating ? 1.2 : 1.0) // ✅ تأثير تكبير عند الضغط
+                                    .animation(.spring(response: 0.4, dampingFraction: 0.6, blendDuration: 0.2), value: rating)
+                                    .onTapGesture {
+                                        withAnimation {
+                                            rating = index
+                                            saveRating()
+                                        }
+                                        UIImpactFeedbackGenerator(style: .light).impactOccurred() // ✅ Haptic Feedback لإحساس واقعي
+                                    }
+                            
+                        
+
+                            }
+                        }
+                        .padding(.bottom, 10)
+                    }
+                    .padding()
+                    .background(BlurView())
+                    .cornerRadius(12)
+                    .padding(16)
                 }
                 
                 VStack {
