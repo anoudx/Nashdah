@@ -11,15 +11,15 @@ struct homescreenView: View {
                 // ✅ رأس الصفحة
                 HStack {
                     Text("مرحبًا بك")
-                        .font(.title)
+                       // .font(.title)
                         .foregroundColor(Color("C1"))
-                    
+                        .font(.custom("SFPro", size: 23))
 
                     Spacer()
 
                     NavigationLink(destination: Likes(likedPlaces: $likedPlaces)) {
                         Image(systemName: "heart.fill")
-                         .resizable().scaledToFit().frame(width: 30, height: 30)
+                         .resizable().scaledToFit().frame(width: 20, height: 20)
                          .padding(.leading,20)
                          .foregroundStyle(Color("C1"))
                     }

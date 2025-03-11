@@ -72,7 +72,7 @@ struct foryou: View {
                                         .padding(.trailing, 80)
                                         
                                         Image(systemName: heartStates[place.id ?? ""] == true ? "heart.fill" : "heart")
-                                            .resizable().scaledToFit().frame(width: 30, height: 30)
+                                            .resizable().scaledToFit().frame(width: 25, height: 25)
                                             .padding(.leading, 50)
                                             .padding(.bottom, 55.0)
                                             .foregroundStyle(Color("C1"))
