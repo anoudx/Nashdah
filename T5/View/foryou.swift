@@ -327,6 +327,13 @@ struct Place2: Identifiable, Codable {
     let category: String // التصنيف (مثل "قهوة"، "مطاعم"، إلخ)
     var imageName: String?
     let location: String
+    let coordinate: Coordinate // سيتم تعريف هذا في الأسفل
+
+    struct Coordinate: Codable {
+        let latitude: Double
+        let longitude: Double
+    }
+
 
 }
 func loadPlacesFromJSON() -> [Place2] {

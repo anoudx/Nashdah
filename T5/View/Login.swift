@@ -21,12 +21,12 @@ struct Login: View {
     var body: some View {
         NavigationView {
             VStack {
-                Text("اهلاً فيك في\n مسار")
+                Text("اهلاً فيك في\n نَشدة")
                     .font(.custom("SFPro", size: 60))
                     .fontWeight(.bold)
                     .multilineTextAlignment(.center)
                     .padding()
-                    .padding(.bottom, 100)
+                    .padding(.bottom, 100).frame(width:500,height: 280)
                 
                 TextField("البريد الإلكتروني", text: $email)
                     .textFieldStyle(RoundedBorderTextFieldStyle())

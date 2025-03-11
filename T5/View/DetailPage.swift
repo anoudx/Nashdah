@@ -80,16 +80,25 @@ struct DetailPage: View {
                 .padding(.trailing, 300.0)
             
             // استخدام Map مع المعاملات الصحيحة
-            Map(coordinateRegion: $region, interactionModes: .all, annotationItems: [location]) { location in
-                MapMarker(coordinate: location.coordinate, tint: Color("C1"))
+      
+            Map(coordinateRegion: $region, interactionModes: .all, annotationItems: [Location(coordinate: CLLocationCoordinate2D(latitude: place.coordinate.latitude, longitude: place.coordinate.longitude))]) { location in
+                MapPin(coordinate: location.coordinate, tint: Color("C1"))
             }
             .frame(height: 162.0)
-            
+
+
+                     
+                     
      
         }
         .environment(\.layoutDirection, .rightToLeft)
         .onAppear {
             fetchRating() // استرجاع التقييم عند تحميل الصفحة
+         
+            region.center = CLLocationCoordinate2D(latitude: place.coordinate.latitude, longitude: place.coordinate.longitude)
+ // تحديث مركز الخريطة باستخدام الإحداثيات
+                     
+            
         }
     }
     
@@ -174,9 +183,9 @@ struct DetailPage: View {
 
     
     
-    struct DetailPage_Previews: PreviewProvider {
-        static var previews: some View {
-            DetailPage(place: Place2(id: "1", key: "11", name: "سليب |slip", descriptionText: "قهوة لذيذة، مكان هادئ☕️", category: "قهوة",imageName: "slip" ,location:  "" ))
-        }
-    }
+//    struct DetailPage_Previews: PreviewProvider {
+//        static var previews: some View {
+//            DetailPage(place: Place2(id: "1", key: "11", name: "سليب |slip", descriptionText: "قهوة لذيذة، مكان هادئ☕️", category: "قهوة",imageName: "slip" ,location: " السعودية" ),coordinateSpace:  24.7136, 46.6753 )
+//        }
+//    }
 }
