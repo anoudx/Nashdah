@@ -30,6 +30,7 @@ struct homescreenView: View {
                     .frame(height: 1)
                     .background(Color.gray.opacity(0.1))
                    // .padding(.horizontal)
+                    .padding(.bottom, 8)
 
                 // ✅ السكشن الأفقي للأماكن المميزة
                 ScrollView(.horizontal, showsIndicators: false) {
@@ -43,7 +44,7 @@ struct homescreenView: View {
 
                 // ✅ الفلترة
                 HStack(spacing: 24) {
-                    Spacer()
+//                    Spacer()
                     ForEach(["الكل", "مطاعم", "قهوة", "منتزهات", "مكتبات"], id: \.self) { category in
                         Text(category)
                             .foregroundColor(selectedCategory == category ? Color("C1") : .gray)
@@ -56,6 +57,7 @@ struct homescreenView: View {
                 }
                 .padding(.trailing, 30)
                 .padding(.top, 25)
+                .padding(.bottom, 8)
 
                 // ✅ قائمة الأماكن مع التنقل الصحيح
                 VStack {
