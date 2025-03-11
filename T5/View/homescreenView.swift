@@ -42,18 +42,20 @@ struct homescreenView: View {
                 }
 
                 // ✅ الفلترة
-                HStack(spacing: 18) {
+                HStack(spacing: 24) {
                     Spacer()
                     ForEach(["الكل", "مطاعم", "قهوة", "منتزهات", "مكتبات"], id: \.self) { category in
                         Text(category)
                             .foregroundColor(selectedCategory == category ? Color("C1") : .gray)
-                            .font(.body)
+                          
+                            
                             .onTapGesture {
                                 selectCategory(category)
                             }
                     }
                 }
-                .padding(.trailing, 50)
+                .padding(.trailing, 30)
+                .padding(.top, 25)
 
                 // ✅ قائمة الأماكن مع التنقل الصحيح
                 VStack {
@@ -107,29 +109,28 @@ struct PlaceCardView: View {
                
                 VStack(alignment: .trailing, spacing: 4) {
                     Text(place.name ?? "اسم غير معروف")
-                        .font(.headline)
-                        .fontWeight(.regular)
+                        .font(.custom("SFPro", size: 18))
                         .foregroundColor(Color.black)
-                        .frame(maxWidth: 190, alignment: .leading)
+                        .frame(maxWidth: 180, alignment: .leading)
                     
                     Text(place.descriptionText ?? "وصف غير متاح")
-                        .font(.caption)
-                        .fontWeight(.regular)
+                        .font(.custom("SFPro", size: 14))
                         .foregroundColor(.gray)
                         .frame(maxWidth: 180, alignment: .leading)
                         .lineLimit(2)
                     
                     HStack {
                         Image(systemName: "mappin.and.ellipse")
+                            .font(.system(size: 11))
                             .foregroundColor(.black)
-                            .frame(width: 12)
+                            //.frame(width: 12)
+                         
                         
                         Text(place.location ?? "مكان غير متاح")
-                            .font(.caption)
-                            .fontWeight(.regular)
+                            .font(.custom("SFPro", size: 11))
                             .foregroundColor(.black)
                     }
-                    .frame(maxWidth: 190, alignment: .leading)
+                    .frame(maxWidth: 180, alignment: .leading)
                 }
                 .padding(.trailing, 10)
 
