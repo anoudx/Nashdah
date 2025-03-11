@@ -35,7 +35,7 @@ struct DetailPage: View {
                     
                     VStack(alignment: .trailing) {
                         Text(place.name)
-                            .font(.headline)
+                            .font(.system(size: 16))
                            // .bold()
                             .foregroundColor(.white)
                             .padding(.bottom, 5)
@@ -45,7 +45,7 @@ struct DetailPage: View {
                                 Image(systemName: index <= rating ? "star.fill" : "star")
                                     .resizable()
                                     .scaledToFit()
-                                    .frame(width: 18, height: 18) // ✅ تكبير النجوم قليلًا لجعلها أكثر بروزًا
+                                    .frame(width: 14, height: 14) // ✅ تكبير النجوم قليلًا لجعلها أكثر بروزًا
                                     .foregroundColor(index <= rating ? .yellow : .gray.opacity(0.5)) // ✅ تحسين وضوح النجوم غير المحددة
                                     .scaleEffect(index == rating ? 1.2 : 1.0) // ✅ تأثير تكبير عند الضغط
                                     .animation(.spring(response: 0.4, dampingFraction: 0.6, blendDuration: 0.2), value: rating)

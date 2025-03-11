@@ -72,10 +72,10 @@ struct homescreenView: View {
                 }
                 .padding(.horizontal, 10)
 
-                Spacer()
+//                Spacer()
             }
             .environment(\.layoutDirection, .rightToLeft)
-            .padding()
+//            .padding()
             .onAppear {
                 loadPlaces()
             }
