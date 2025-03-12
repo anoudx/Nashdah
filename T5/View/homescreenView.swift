@@ -42,23 +42,24 @@ struct homescreenView: View {
                     .frame(height: 150)
                 }
 
-                // ✅ الفلترة
-                HStack(spacing: 24) {
-//                    Spacer()
-                    ForEach(["الكل", "مطاعم", "قهوة", "منتزهات", "مكتبات"], id: \.self) { category in
-                        Text(category)
-                            .foregroundColor(selectedCategory == category ? Color("C1") : .gray)
-                          
+                ScrollView(.horizontal, showsIndicators: false) {
+                    
+                    HStack(spacing: 24) {
+                        Spacer(minLength: 1)
+                        ForEach(["الكل", "مطاعم", "قهوة", "منتزهات","ترفية", "مكتبات"], id: \.self) { category in
+                            Text(category)
+                                .foregroundColor(selectedCategory == category ? Color("C1") : .gray)
                             
-                            .onTapGesture {
-                                selectCategory(category)
-                            }
+                            
+                                .onTapGesture {
+                                    selectCategory(category)
+                                }
+                        }
                     }
+                    .padding(.trailing, 30)
+                    .padding(.top, 25)
+                    .padding(.bottom, 8)
                 }
-                .padding(.trailing, 30)
-                .padding(.top, 25)
-                .padding(.bottom, 8)
-
                 // ✅ قائمة الأماكن مع التنقل الصحيح
                 VStack {
                     ScrollView(.vertical, showsIndicators: false) {

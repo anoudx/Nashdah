@@ -13,17 +13,19 @@ struct Likes: View {
     @Binding var likedPlaces: [Place2] // Binding لقائمة الأماكن المفضلة
     @State private var heartStates: [String: Bool] = [:] // حالة الإعجاب لكل مكان
 
+    @Environment(\.dismiss) var dismiss
+    
     var body: some View {
         NavigationStack {
             VStack(spacing: 12) {
                 Text("الأماكن المفضلة")
                     .font(.system(size: 24))
                     .padding(.top, 16)
-
+                
                 Divider()
                     .frame(height: 1)
                     .background(Color.gray.opacity(0.1))
-
+                
                 ScrollView(.vertical, showsIndicators: false) {
                     ForEach(likedPlaces, id: \.id) { place in
                         ZStack (alignment: .leading){
@@ -89,8 +91,22 @@ struct Likes: View {
             }
         }
         .environment(\.layoutDirection, .rightToLeft)
-    }
+        
+        //حذف back
+        .navigationBarBackButtonHidden(true)
+        .navigationBarItems(leading: Button(action: {
+                dismiss()
+        }) {
+            Image(systemName: "chevron.backward") // يظهر السهم فقط
+                .foregroundColor(Color("C1"))
+        })
+        
+        
+    }// end body
 
+    
+    
+    
     // دالة لتحميل الأماكن المفضلة (التي تم إعجابها) من CloudKit
     private func loadLikedPlaces() async {
         let database = CKContainer.default().publicCloudDatabase

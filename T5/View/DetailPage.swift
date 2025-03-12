@@ -17,6 +17,8 @@ struct DetailPage: View {
         span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)
     )
     
+    @Environment(\.dismiss) var dismiss
+
     var body: some View {
         ScrollView {
             VStack {
@@ -36,7 +38,7 @@ struct DetailPage: View {
                     VStack(alignment: .trailing) {
                         Text(place.name)
                             .font(.system(size: 16))
-                           // .bold()
+                        // .bold()
                             .foregroundColor(.white)
                             .padding(.bottom, 5)
                         
@@ -56,9 +58,9 @@ struct DetailPage: View {
                                         }
                                         UIImpactFeedbackGenerator(style: .light).impactOccurred() // ✅ Haptic Feedback لإحساس واقعي
                                     }
-                            
-                        
-
+                                
+                                
+                                
                             }
                         }
                         .padding(.bottom, 10)
@@ -87,7 +89,7 @@ struct DetailPage: View {
                         
                         Text("الموقع")
                             .font(.title3)
-                      
+                        
                     }
                     .padding(.top, 10)
                     .frame(maxWidth: .infinity, alignment: .trailing)
@@ -102,10 +104,21 @@ struct DetailPage: View {
                 }
             }
         }
-      //  .environment(\.layoutDirection, .rightToLeft)
+        //  .environment(\.layoutDirection, .rightToLeft)
         .onAppear {
             fetchRating()
         }
+        
+        //حذف back
+        .navigationBarBackButtonHidden(true)
+        .navigationBarItems(leading: Button(action: {
+            dismiss()
+        }) {
+            Image(systemName: "chevron.backward") // يظهر السهم فقط
+                .foregroundColor(Color("C1"))
+        })
+        
+        
     }
     
     private func saveRating() {
