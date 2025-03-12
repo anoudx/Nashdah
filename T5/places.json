@@ -416,6 +416,35 @@
         "latitude": 24.8347027,
         "longitude": 46.6796893
     }
+  },
+  
+  {
+      "id":"35",
+      "key": "11",
+      "name": "بِساط",
+      "category": "الكل",
+      "descriptionText": "مجلس بِساط تجد فيه الرحابة والكرم وحسن الضيافة ",
+      "imageName": "basat.jpg",
+      "location": "النرجس",
+      "coordinate":{
+          "latitude": 24.8347027,
+          "longitude": 46.6796893
+      }
+      
+  },
+  
+  {
+      "id":"36",
+      "key": "11",
+      "name": "وثبة",
+      "category": "الكل",
+      "descriptionText": "اللوحة الحُلُم وثبة الحياة",
+      "imageName": "IMG_0632.jpg",
+      "location": "النرجس",
+      "coordinate":{
+          "latitude": 24.8347027,
+          "longitude": 46.6796893
+      }
   }
   ]
 
