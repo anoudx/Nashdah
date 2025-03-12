@@ -17,8 +17,13 @@ class RegistrationViewModel: ObservableObject {
     @Published var successMessage = ""
     @Published var isAuthenticated = false
 
-
     func registerUser() {
+        // تحقق من الحقول الفارغة
+        if email.isEmpty || password.isEmpty || fullName.isEmpty {
+            self.errorMessage = "يرجى تعبئة جميع الحقول"
+            return
+        }
+        
         let passwordHash = hashPassword(password)
 
         let record = CKRecord(recordType: "User")
@@ -61,25 +66,32 @@ struct RegistrationView: View {
             Text("تسجيل جديد")
                 .font(.system(size: 21))
                 .padding(.trailing, 220)
-
+                .padding(.bottom,8)
             TextField("الاسم الكامل", text: $viewModel.fullName)
-                .textFieldStyle(RoundedBorderTextFieldStyle())
-                .padding()
-
+                .padding().frame(width: 326, height: 53).cornerRadius(18)  .overlay(
+                    RoundedRectangle(cornerRadius: 18)
+                        .stroke(Color("C2"), lineWidth: 1) // إضافة حد بلون محدد وحجمه
+                )
+                .padding(.bottom,32)
             TextField("البريد الإلكتروني", text: $viewModel.email)
-                .textFieldStyle(RoundedBorderTextFieldStyle())
-                .padding()
-
+                .padding().frame(width: 326, height: 53).cornerRadius(18)  .overlay(
+                    RoundedRectangle(cornerRadius: 18)
+                        .stroke(Color("C2"), lineWidth: 1) // إضافة حد بلون محدد وحجمه
+                )
+                .padding(.bottom,32)
             SecureField("كلمة المرور", text: $viewModel.password)
-                .textFieldStyle(RoundedBorderTextFieldStyle())
-                .padding()
-
+                .padding().frame(width: 326, height: 53).cornerRadius(18)  .overlay(
+                    RoundedRectangle(cornerRadius: 18)
+                        .stroke(Color("C2"), lineWidth: 1) // إضافة حد بلون محدد وحجمه
+                )
+            // عرض رسالة الخطأ إذا كانت الحقول فارغة
             if !viewModel.errorMessage.isEmpty {
                 Text(viewModel.errorMessage)
                     .foregroundColor(.red)
                     .padding()
             }
 
+            // عرض رسالة النجاح
             if !viewModel.successMessage.isEmpty {
                 Text(viewModel.successMessage)
                     .foregroundColor(.green)
@@ -101,7 +113,7 @@ struct RegistrationView: View {
             NavigationLink(destination: Login(), isActive: $viewModel.isAuthenticated) {
                 EmptyView()
             }
-            //حذف back
+            // حذف back
             .navigationBarBackButtonHidden(true)
             .navigationBarItems(leading: Button(action: {
                 dismiss()
@@ -110,7 +122,7 @@ struct RegistrationView: View {
                     .foregroundColor(Color("C1"))
             })
         }
-        .padding()
+        .padding(.bottom,150)
         .environment(\.layoutDirection, .rightToLeft)
     }
 }

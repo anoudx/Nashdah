@@ -97,7 +97,7 @@ struct homescreenView: View {
             .onAppear {
                 loadPlaces()
             }
-        }
+        }.navigationBarBackButtonHidden(true)
     }
     
     //  تحميل الأماكن عند بدء التشغيل

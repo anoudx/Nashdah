@@ -18,7 +18,7 @@ struct Login: View {
    
     @AppStorage("userEmail") private var storedEmail: String = ""  // edit
     @AppStorage("isLoggedIn") private var isLoggedIn: Bool = false // ✅ تحديد هل المستخدم مسجل أم لا
-
+    @AppStorage("isFirstLaunchR") private var isFirstLaunchR: Bool = true
     var body: some View {
         NavigationView {
             VStack {
@@ -28,14 +28,19 @@ struct Login: View {
                     .multilineTextAlignment(.center)
                     .padding()
                     .padding(.bottom, 100).frame(width:500,height: 280)
-                
+                Text("تسجيل الدخول").font(.system(size: 14)).fontWeight(.bold).padding(.trailing,230)
+                    .padding(.bottom,8)
                 TextField("البريد الإلكتروني", text: $email)
-                    .textFieldStyle(RoundedBorderTextFieldStyle())
-                    .padding(.horizontal,20)
+                    .padding().frame(width: 326, height: 53).cornerRadius(18)  .overlay(
+                        RoundedRectangle(cornerRadius: 18)
+                            .stroke(Color("C2"), lineWidth: 1) // إضافة حد بلون محدد وحجمه
+                    )
                     .padding(.bottom,8)
                 SecureField("كلمة المرور", text: $password)
-                    .textFieldStyle(RoundedBorderTextFieldStyle())
-                    .padding(.horizontal,20)
+                    .padding().frame(width: 326, height: 53).cornerRadius(18)  .overlay(
+                        RoundedRectangle(cornerRadius: 18)
+                            .stroke(Color("C2"), lineWidth: 1) // إضافة حد بلون محدد وحجمه
+                    )
                 
                 if !errorMessage.isEmpty {
                     Text(errorMessage)
@@ -44,9 +49,14 @@ struct Login: View {
                 }
                 
                 Button(action: {
-                    // استخدام Task لاستدعاء الدالة المتزامنة
-                    Task {
-                        await loginUser(email: email, password: password)
+                    // تحقق إذا كان البريد الإلكتروني أو كلمة المرور فارغين
+                    if email.isEmpty || password.isEmpty {
+                        errorMessage = "يرجى إدخال البريد الإلكتروني وكلمة المرور"
+                    } else {
+                        // استخدام Task لاستدعاء الدالة المتزامنة
+                        Task {
+                            await loginUser(email: email, password: password)
+                        }
                     }
                 }) {
                     Text("الدخول")
@@ -64,11 +74,18 @@ struct Login: View {
                         .font(.body)
                         .foregroundColor(Color("C1"))
                 }
-                
-                // رابط للانتقال إلى الصفحة الرئيسية بعد تسجيل الدخول
-                NavigationLink(destination: ContentView(), isActive: $isAuthenticated) {
-                    EmptyView()
+                if isFirstLaunchR {
+                    
+                    NavigationLink(destination: UserRecommendations(), isActive: $isAuthenticated) {
+                      
+                    }
+                    
                 }
+                else{
+                    // رابط للانتقال إلى الصفحة الرئيسية بعد تسجيل الدخول
+                    NavigationLink(destination: ContentView(), isActive: $isAuthenticated) {
+                        EmptyView()
+                    }}
             }
             .padding()
             .environment(\.layoutDirection, .rightToLeft)

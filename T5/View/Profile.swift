@@ -13,7 +13,7 @@ struct Profile: View {
     @State private var userEmail = ""
     @State private var userName = ""
     @State private var isEditing = false
-    
+    @State private var likedPlaces: [Place2] = []
     @AppStorage("isLoggedIn") private var isLoggedIn: Bool = false // ✅ تحديد هل المستخدم مسجل أم لا
     
     @AppStorage("userEmail") private var storedEmail: String = ""  // edit
@@ -32,13 +32,14 @@ struct Profile: View {
                    TextField("أدخل الاسم", text: $userName)
                    .textFieldStyle(RoundedBorderTextFieldStyle())
                    .frame(width: 200)
+                   
                        } else {
-                         Text(userName)
+                           Text(userName)
                          .font(.custom("SFPro", size: 22))
                          .fontWeight(.semibold)
                                               }
                                
-                               Text(userEmail)
+                Text(userEmail)
                                .font(.custom("SFPro", size: 12))
                                .foregroundColor(.gray)
 
@@ -58,7 +59,7 @@ struct Profile: View {
                 Spacer()
                     .frame(height: 30)
                 
-                NavigationLink(destination: Likes(likedPlaces: .constant([]))) {
+                NavigationLink(destination: Likes(likedPlaces:$likedPlaces)) {
                                     HStack{
                                         Image(systemName: "chevron.left")
                                             .foregroundColor(.gray)
@@ -111,7 +112,24 @@ struct Profile: View {
     }
     
     //  دالة لجلب بيانات المستخدم من CloudKit
-
+    func fetchUserByEmail(email: String) async throws -> CKRecord? {
+        let predicate = NSPredicate(format: "email == %@", email)
+        let query = CKQuery(recordType: "User", predicate: predicate)
+        
+        let database = CKContainer.default().privateCloudDatabase
+        let (matchResults, _) = try await database.records(matching: query)
+        
+        if let result = matchResults.first?.1 {
+            switch result {
+            case .success(let record):
+                return record
+            case .failure(let error):
+                throw error
+            }
+        } else {
+            return nil
+        }
+    }
     func fetchUserData() {
         guard let storedEmail = UserDefaults.standard.string(forKey: "userEmail"), !storedEmail.isEmpty else {
             print("❌ لم يتم العثور على البريد المخزن")
@@ -120,7 +138,7 @@ struct Profile: View {
 
         let predicate = NSPredicate(format: "email == %@", storedEmail)
         let query = CKQuery(recordType: "User", predicate: predicate)
-        let database = CKContainer.default().publicCloudDatabase
+        let database = CKContainer.default().privateCloudDatabase
 
         database.perform(query, inZoneWith: nil) { results, error in
             if let error = error {
