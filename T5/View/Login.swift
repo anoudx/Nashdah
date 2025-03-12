@@ -122,9 +122,13 @@ struct Login: View {
             if storedPasswordHash == enteredPasswordHash {
                 DispatchQueue.main.async {
                     self.isAuthenticated = true // الانتقال إلى الصفحة الرئيسية
-                    self.storedEmail = email // حفظ البريد الإلكتروني
+                   
                     self.isLoggedIn = true // تحديث حالة تسجيل الدخول
-                }
+                    UserDefaults.standard.set(true, forKey: "isLoggedIn")
+                  
+                    self.storedEmail = email // حفظ البريد الإلكتروني
+                    UserDefaults.standard.set(email, forKey: "userEmail")
+                    print("📌 الإيميل المخزن في UserDefaults: \(UserDefaults.standard.string(forKey: "userEmail") ?? "غير موجود")")                }
             } else {
                 DispatchQueue.main.async {
                     self.errorMessage = "البريد الإلكتروني أو كلمة المرور غير صحيحة."

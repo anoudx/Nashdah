@@ -18,6 +18,8 @@ struct Profile: View {
     
     @AppStorage("userEmail") private var storedEmail: String = ""  // edit
 
+        @Environment(\.presentationMode) var presentationMode
+
     var body: some View {
         NavigationView {
             VStack(spacing: 15) {
@@ -100,14 +102,8 @@ struct Profile: View {
             
         }
         .onAppear {
-            if !isLoggedIn {
-                DispatchQueue.main.async {
-                    UIApplication.shared.windows.first?.rootViewController = UIHostingController(rootView: Login())
-                    UIApplication.shared.windows.first?.makeKeyAndVisible()
-                }
-            } else {
-                fetchUserData() // تحميل بيانات المستخدم عند الدخول للملف الشخصي
-            }
+       fetchUserData() // تحميل بيانات المستخدم عند الدخول للملف الشخصي
+
         }
         .fullScreenCover(isPresented: .constant(!isLoggedIn)) { // ✅ إذا لم يكن مسجلًا، انتقل إلى `LoginView`
             Login()
@@ -115,30 +111,36 @@ struct Profile: View {
     }
     
     //  دالة لجلب بيانات المستخدم من CloudKit
-       func fetchUserData() {
-       
-           guard let storedEmail = UserDefaults.standard.string(forKey: "userEmail") else {
-               return
-           }
 
-           let predicate = NSPredicate(format: "email == %@", storedEmail)
-           let query = CKQuery(recordType: "User", predicate: predicate)
+    func fetchUserData() {
+        guard let storedEmail = UserDefaults.standard.string(forKey: "userEmail"), !storedEmail.isEmpty else {
+            print("❌ لم يتم العثور على البريد المخزن")
+            return
+        }
 
-           let database = CKContainer.default().publicCloudDatabase
-           database.perform(query, inZoneWith: nil) { results, error in
-               if let error = error {
-                   print("❌ خطأ أثناء جلب البيانات: \(error.localizedDescription)")
-                   return
-               }
+        let predicate = NSPredicate(format: "email == %@", storedEmail)
+        let query = CKQuery(recordType: "User", predicate: predicate)
+        let database = CKContainer.default().publicCloudDatabase
 
-               if let results = results, let record = results.first {
-                   DispatchQueue.main.async {
-                       self.userEmail = record["email"] as? String ?? ""
-                       self.userName = record["fullName"] as? String ?? "مستخدم مجهول"
-                   }
-               }
-           }
-       }
+        database.perform(query, inZoneWith: nil) { results, error in
+            if let error = error {
+                print("❌ خطأ أثناء جلب البيانات: \(error.localizedDescription)")
+                return
+            }
+
+            guard let record = results?.first else {
+                print("⚠️ لم يتم العثور على بيانات المستخدم")
+                return
+            }
+
+            DispatchQueue.main.async {
+                self.userEmail = record["email"] as? String ?? ""
+                self.userName = record["fullName"] as? String ?? "مستخدم مجهول"
+                print("✅ تم تحديث البيانات: \(self.userEmail), \(self.userName)")
+            }
+        }
+    }
+//    @Environment(\.presentationMode) var presentationMode
 
        func logout() {
            storedEmail = "" // delete email
@@ -148,6 +150,7 @@ struct Profile: View {
            UserDefaults.standard.set(false, forKey: "isAuthenticated")
            
            DispatchQueue.main.async {
+               self.presentationMode.wrappedValue.dismiss()
                if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
                   let window = windowScene.windows.first {
                    window.rootViewController = UIHostingController(rootView: Login())

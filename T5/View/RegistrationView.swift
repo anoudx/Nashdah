@@ -17,6 +17,7 @@ class RegistrationViewModel: ObservableObject {
     @Published var successMessage = ""
     @Published var isAuthenticated = false
 
+
     func registerUser() {
         let passwordHash = hashPassword(password)
 
@@ -47,6 +48,8 @@ class RegistrationViewModel: ObservableObject {
 
 struct RegistrationView: View {
     @StateObject private var viewModel = RegistrationViewModel()
+    
+    @Environment(\.dismiss) var dismiss
 
     var body: some View {
         VStack {
@@ -98,6 +101,14 @@ struct RegistrationView: View {
             NavigationLink(destination: Login(), isActive: $viewModel.isAuthenticated) {
                 EmptyView()
             }
+            //حذف back
+            .navigationBarBackButtonHidden(true)
+            .navigationBarItems(leading: Button(action: {
+                dismiss()
+            }) {
+                Image(systemName: "chevron.left") // يظهر السهم فقط
+                    .foregroundColor(Color("C1"))
+            })
         }
         .padding()
         .environment(\.layoutDirection, .rightToLeft)

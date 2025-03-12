@@ -21,8 +21,8 @@ struct foryou: View {
         NavigationStack {
             VStack(spacing:12){
                 Text("توصيات لك")
-                    .font(.system(size: 24))
-                
+                    .font(.custom("SFPro", size: 24))
+
                 Divider()
                     .frame(height: 1)
                     .background(Color.gray.opacity(0.1))
@@ -115,6 +115,7 @@ struct foryou: View {
                         
                     }
                 }
+                
             }
         }
         .environment(\.layoutDirection, .rightToLeft)

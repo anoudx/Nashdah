@@ -18,13 +18,14 @@ struct Likes: View {
     var body: some View {
         NavigationStack {
             VStack(spacing: 12) {
-                Text("الأماكن المفضلة")
-                    .font(.system(size: 24))
-                    .padding(.top, 16)
+//                Text("الأماكن المفضلة")
+//                    .font(.system(size: 24))
+//                    .padding(.top, 16)
                 
                 Divider()
                     .frame(height: 1)
                     .background(Color.gray.opacity(0.1))
+                
                 if isLoggedIn && !likedPlaces.isEmpty {
                     ScrollView(.vertical, showsIndicators: false) {
                         ForEach(likedPlaces, id: \.id) { place in
@@ -118,14 +119,34 @@ struct Likes: View {
         
         //حذف back
         .navigationBarBackButtonHidden(true)
-        .navigationBarItems(leading: Button(action: {
-                dismiss()
-        }) {
-            Image(systemName: "chevron.backward") // يظهر السهم فقط
-                .foregroundColor(Color("C1"))
-        })
-        
-        
+        //
+        //        .navigationBarItems(leading: Button(action: {
+        //                dismiss()
+        //        }) {
+        //            Image(systemName: "chevron.backward") // يظهر السهم فقط
+        //                .foregroundColor(Color("C1"))
+        //        })
+        //
+        .navigationBarTitleDisplayMode(.inline) // لجعل العنوان بمحاذاة السهم
+        .toolbar {
+            ToolbarItem(placement: .principal) {
+                
+                Text("الأماكن المفضلة") // استبدل النص بعنوان الصفحة
+                    .font(.custom("SFPro", size: 23))
+            }
+            ToolbarItem(placement: .navigationBarLeading) {
+
+                    Button(action: {
+                        dismiss()
+                    }) {
+                        Image(systemName: "chevron.left")
+                            .foregroundColor(Color("C1"))
+                
+                    
+                }
+
+            }
+        }
     }// end body
 
     
