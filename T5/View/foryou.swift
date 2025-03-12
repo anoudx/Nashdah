@@ -131,24 +131,26 @@ struct foryou: View {
         await loadRecommendations()
     }
     private func loadLikedPlaces() async {
+       
         do {
-            // جلب معرف المستخدم
-            let userRecordID = try await fetchUserRecordID()
-            
-            // إنشاء استعلام لجلب الإعجابات
-            let predicate = NSPredicate(format: "userID == %@", userRecordID.recordName)
+            guard let userEmail = UserDefaults.standard.string(forKey: "userEmail") else {
+                print("❌ لم يتم العثور على البريد الإلكتروني للمستخدم")
+                return
+            }
+            print("✅ البريد الإلكتروني للمستخدم: \(userEmail)")
+            let predicate = NSPredicate(format: "userID == %@", userEmail)
             let query = CKQuery(recordType: "Likes", predicate: predicate)
             
-            // تنفيذ الاستعلام
-            let database = CKContainer.default().publicCloudDatabase
+            let database = CKContainer.default().privateCloudDatabase
             let records = try await database.records(matching: query)
             
-            // تحديث حالة القلب بناءً على النتائج
             for result in records.matchResults {
                 if let record = try? result.1.get(),
                    let placeID = record["placeID"] as? String {
                     DispatchQueue.main.async {
+                       
                         self.heartStates[placeID] = true
+                        print("✅ تم تحميل الإعجاب للمكان: \(placeID)")
                     }
                 }
             }
@@ -156,14 +158,18 @@ struct foryou: View {
             print("❌ خطأ في جلب الإعجابات: \(error.localizedDescription)")
         }
     }
+
         
     private func fetchLikedPlaceIDs() async -> [String] {
         var likedPlaceIDs: [String] = []
-        let database = CKContainer.default().publicCloudDatabase
-        let predicate = NSPredicate(format: "userID == %@", "user123")
+        // جلب معرف المستخدم
+        do{ let userRecordID = try await fetchUserRecordID()
+       
+        let database = CKContainer.default().privateCloudDatabase
+        let predicate = NSPredicate(format: "userID == %@", userRecordID.recordName)
         let query = CKQuery(recordType: "Likes", predicate: predicate)
         
-        do {
+    
             let results = try await database.records(matching: query)
             for result in results.matchResults {
                 if let record = try? result.1.get(),
@@ -185,13 +191,15 @@ struct foryou: View {
         if newState {
             await addLike(place)
             DispatchQueue.main.async {
-                     self.likedPlaces.append(place) // إضافة المكان إلى القائمة
-                 }
+                self.likedPlaces.append(place)
+                print("✅ تمت إضافة المكان إلى الأماكن المفضلة: \(place.name ?? "اسم غير معروف")")
+            }
         } else {
             await removeLike(place)
             DispatchQueue.main.async {
-                   self.likedPlaces.removeAll { $0.id == place.id } // إزالة المكان من القائمة
-               }
+                self.likedPlaces.removeAll { $0.id == place.id }
+                print("✅ تمت إزالة المكان من الأماكن المفضلة: \(place.name ?? "اسم غير معروف")")
+            }
         }
         
         DispatchQueue.main.async {
@@ -201,15 +209,19 @@ struct foryou: View {
 
     private func addLike(_ place: Place2) async {
         do {
-            let userRecordID = try await fetchUserRecordID()
+            guard let userEmail = UserDefaults.standard.string(forKey: "userEmail") else {
+                print("❌ لم يتم العثور على البريد الإلكتروني للمستخدم")
+                return
+            }
+            
             let record = CKRecord(recordType: "Likes")
             record["placeID"] = place.id
             record["liked"] = true
-            record["userID"] = userRecordID.recordName
+            record["userID"] = userEmail // ربط الإعجاب بالمستخدم
             
-            let database = CKContainer.default().publicCloudDatabase
+            let database = CKContainer.default().privateCloudDatabase
             try await database.save(record)
-            print("✅ تم حفظ حالة الإعجاب بنجاح!")
+            print("✅ تم حفظ حالة الإعجاب بنجاح للمكان: \(place.name ?? "اسم غير معروف")")
         } catch {
             print("❌ خطأ في حفظ حالة الإعجاب: \(error.localizedDescription)")
         }
@@ -229,17 +241,27 @@ struct foryou: View {
     }
     private func removeLike(_ place: Place2) async {
         do {
-            let userRecordID = try await fetchUserRecordID()
-            let predicate = NSPredicate(format: "placeID == %@ AND userID == %@", place.id ?? "", userRecordID.recordName)
+            guard let userEmail = UserDefaults.standard.string(forKey: "userEmail") else {
+                print("❌ لم يتم العثور على البريد الإلكتروني للمستخدم")
+                return
+            }
+            
+            let predicate = NSPredicate(format: "placeID == %@ AND userID == %@", place.id ?? "", userEmail)
             let query = CKQuery(recordType: "Likes", predicate: predicate)
             
-            let database = CKContainer.default().publicCloudDatabase
+            let database = CKContainer.default().privateCloudDatabase
             let records = try await database.records(matching: query)
             
             for result in records.matchResults {
                 if let record = try? result.1.get() {
                     try await database.deleteRecord(withID: record.recordID)
                     print("✅ تم حذف الإعجاب بنجاح!")
+                    
+                    // تحديث likedPlaces بعد الحذف
+                    DispatchQueue.main.async {
+                        self.likedPlaces.removeAll { $0.id == place.id }
+                        print("✅ تم تحديث الأماكن المفضلة بعد الحذف: \(self.likedPlaces)")
+                    }
                 }
             }
         } catch {
@@ -289,7 +311,6 @@ struct foryou: View {
             }
         }
     private func fetchUserRatings(completion: @escaping ([Int64: Double]) -> Void) {
-        // جلب التقييمات من CloudKit (تحتاج لاستبدال userID بمعرف المستخدم الفعلي)
         let predicate = NSPredicate(format: "userID == %@", "user123")
         let query = CKQuery(recordType: "Rating", predicate: predicate)
         
@@ -306,14 +327,13 @@ struct foryou: View {
                 return
             }
             
-            var userRatings: [Int64: Double] = [:]  // معجم لتخزين التقييمات
+            var userRatings: [Int64: Double] = [:]
             for record in results {
                 if let placeID = record["placeID"] as? String, let rating = record["rating"] as? Int, let placeIDInt64 = Int64(placeID) {
                     userRatings[placeIDInt64] = Double(rating)
                 }
             }
             
-            // إرسال التقييمات إلى دالة التحميل بعد جمعها
             completion(userRatings)
         }
     }

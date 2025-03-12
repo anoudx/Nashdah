@@ -7,6 +7,7 @@
 
 import SwiftUI
 import CloudKit
+import CryptoKit
 
 struct Login: View {
     @State private var email = ""
@@ -43,7 +44,10 @@ struct Login: View {
                 }
                 
                 Button(action: {
-                    loginUser(email: email, password: password)
+                    // استخدام Task لاستدعاء الدالة المتزامنة
+                    Task {
+                        await loginUser(email: email, password: password)
+                    }
                 }) {
                     Text("الدخول")
                         .foregroundColor(.black)
@@ -83,32 +87,62 @@ struct Login: View {
         }
         .navigationBarBackButtonHidden(true)
     }
-    
-    func loginUser(email: String, password: String) {
-        let predicate = NSPredicate(format: "email == %@ AND password == %@", email, password)
+
+    // دالة لاسترجاع المستخدم بناءً على البريد الإلكتروني
+    func fetchUserByEmail(email: String) async throws -> CKRecord? {
+        let predicate = NSPredicate(format: "email == %@", email)
         let query = CKQuery(recordType: "User", predicate: predicate)
         
-        let database = CKContainer.default().publicCloudDatabase
-        database.perform(query, inZoneWith: nil) { results, error in
-            if let error = error {
-                DispatchQueue.main.async {
-                    self.errorMessage = "حدث خطأ أثناء تسجيل الدخول: \(error.localizedDescription)"
-                }
-                return
+        let database = CKContainer.default().privateCloudDatabase
+        let (matchResults, _) = try await database.records(matching: query)
+        
+        if let result = matchResults.first?.1 {
+            switch result {
+            case .success(let record):
+                return record
+            case .failure(let error):
+                throw error
+            }
+        } else {
+            return nil
+        }
+    }
+
+    // دالة لتسجيل الدخول
+    func loginUser(email: String, password: String) async {
+        do {
+            guard let record = try await fetchUserByEmail(email: email) else {
+                throw NSError(domain: "UserNotFound", code: 404, userInfo: nil)
             }
             
-            if let results = results, !results.isEmpty {
+            let storedPasswordHash = record["passwordHash"] as? String ?? ""
+            let salt = record["salt"] as? String ?? ""
+            let enteredPasswordHash = self.hashPassword(password, salt: salt)
+            
+            if storedPasswordHash == enteredPasswordHash {
                 DispatchQueue.main.async {
                     self.isAuthenticated = true // الانتقال إلى الصفحة الرئيسية
-                    self.storedEmail = email // edit
-                    self.isLoggedIn = true // edit
+                    self.storedEmail = email // حفظ البريد الإلكتروني
+                    self.isLoggedIn = true // تحديث حالة تسجيل الدخول
                 }
             } else {
                 DispatchQueue.main.async {
                     self.errorMessage = "البريد الإلكتروني أو كلمة المرور غير صحيحة."
                 }
             }
+        } catch {
+            DispatchQueue.main.async {
+                self.errorMessage = "حدث خطأ أثناء تسجيل الدخول: \(error.localizedDescription)"
+            }
         }
+    }
+
+    // دالة لتشفير كلمة المرور
+    func hashPassword(_ password: String, salt: String) -> String {
+        let saltedPassword = password + salt
+        let inputData = Data(saltedPassword.utf8)
+        let hashed = SHA256.hash(data: inputData)
+        return hashed.compactMap { String(format: "%02x", $0) }.joined()
     }
 }
 

@@ -116,6 +116,7 @@ struct Profile: View {
     
     //  دالة لجلب بيانات المستخدم من CloudKit
        func fetchUserData() {
+       
            guard let storedEmail = UserDefaults.standard.string(forKey: "userEmail") else {
                return
            }

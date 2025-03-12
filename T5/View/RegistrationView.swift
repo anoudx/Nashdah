@@ -7,14 +7,46 @@
 
 import SwiftUI
 import CloudKit
+import CryptoKit
+
+class RegistrationViewModel: ObservableObject {
+    @Published var email = ""
+    @Published var password = ""
+    @Published var fullName = ""
+    @Published var errorMessage = ""
+    @Published var successMessage = ""
+    @Published var isAuthenticated = false
+
+    func registerUser() {
+        let passwordHash = hashPassword(password)
+
+        let record = CKRecord(recordType: "User")
+        record["email"] = email
+        record["fullName"] = fullName
+        record["passwordHash"] = passwordHash
+
+        let database = CKContainer.default().privateCloudDatabase
+        database.save(record) { savedRecord, error in
+            DispatchQueue.main.async {
+                if let error = error {
+                    self.errorMessage = "حدث خطأ أثناء التسجيل: \(error.localizedDescription)"
+                } else {
+                    self.successMessage = "تم إنشاء الحساب بنجاح!"
+                    self.isAuthenticated = true
+                }
+            }
+        }
+    }
+
+    private func hashPassword(_ password: String) -> String {
+        let inputData = Data(password.utf8)
+        let hashed = SHA256.hash(data: inputData)
+        return hashed.compactMap { String(format: "%02x", $0) }.joined()
+    }
+}
 
 struct RegistrationView: View {
-    @State private var email = ""
-    @State private var password = ""
-    @State private var fullName = ""
-    @State private var errorMessage = ""
-    @State private var successMessage = ""
-    @State private var isAuthenticated = false // للانتقال إلى الصفحة الرئيسية بعد التسجيل
+    @StateObject private var viewModel = RegistrationViewModel()
 
     var body: some View {
         VStack {
@@ -27,32 +59,32 @@ struct RegistrationView: View {
                 .font(.system(size: 21))
                 .padding(.trailing, 220)
 
-            TextField("الاسم الكامل", text: $fullName)
+            TextField("الاسم الكامل", text: $viewModel.fullName)
                 .textFieldStyle(RoundedBorderTextFieldStyle())
                 .padding()
 
-            TextField("البريد الإلكتروني", text: $email)
+            TextField("البريد الإلكتروني", text: $viewModel.email)
                 .textFieldStyle(RoundedBorderTextFieldStyle())
                 .padding()
 
-            SecureField("كلمة المرور", text: $password)
+            SecureField("كلمة المرور", text: $viewModel.password)
                 .textFieldStyle(RoundedBorderTextFieldStyle())
                 .padding()
 
-            if !errorMessage.isEmpty {
-                Text(errorMessage)
+            if !viewModel.errorMessage.isEmpty {
+                Text(viewModel.errorMessage)
                     .foregroundColor(.red)
                     .padding()
             }
 
-            if !successMessage.isEmpty {
-                Text(successMessage)
+            if !viewModel.successMessage.isEmpty {
+                Text(viewModel.successMessage)
                     .foregroundColor(.green)
                     .padding()
             }
 
             Button(action: {
-                registerUser(email: email, fullName: fullName, password: password)
+                viewModel.registerUser()
             }) {
                 Text("تسجيل")
                     .foregroundColor(.black)
@@ -63,35 +95,12 @@ struct RegistrationView: View {
             }
             .padding()
             
-            // رابط للانتقال إلى صفحة تسجيل الدخول
-            NavigationLink(destination: Login(), isActive: $isAuthenticated) {
+            NavigationLink(destination: Login(), isActive: $viewModel.isAuthenticated) {
                 EmptyView()
             }
         }
         .padding()
         .environment(\.layoutDirection, .rightToLeft)
-    }
-
-    func registerUser(email: String, fullName: String, password: String) {
-        let record = CKRecord(recordType: "User")
-        record["email"] = email
-        record["fullName"] = fullName
-        record["password"] = password
-
-        let database = CKContainer.default().publicCloudDatabase
-        database.save(record) { savedRecord, error in
-            if let error = error {
-                DispatchQueue.main.async {
-                    self.errorMessage = "حدث خطأ أثناء التسجيل: \(error.localizedDescription)"
-                }
-                return
-            }
-
-            DispatchQueue.main.async {
-                self.successMessage = "تم إنشاء الحساب بنجاح!"
-                self.isAuthenticated = true // الانتقال إلى الصفحة الرئيسية
-            }
-        }
     }
 }
 

@@ -95,7 +95,7 @@ struct DetailPage: View {
                     .frame(maxWidth: .infinity, alignment: .trailing)
                     .padding(.horizontal)
                     
-                    Map(coordinateRegion: $region, interactionModes: .all, annotationItems: [location]) { location in
+                    Map(coordinateRegion: $region, annotationItems: [Location(coordinate: CLLocationCoordinate2D(latitude: place.coordinate.latitude, longitude: place.coordinate.longitude))]) { location in
                         MapPin(coordinate: location.coordinate, tint: Color("C1"))
                     }
                     .frame(height: 180)
@@ -107,6 +107,7 @@ struct DetailPage: View {
         //  .environment(\.layoutDirection, .rightToLeft)
         .onAppear {
             fetchRating()
+            region.center = CLLocationCoordinate2D(latitude: place.coordinate.latitude, longitude: place.coordinate.longitude)
         }
         
         //حذف back
@@ -122,73 +123,58 @@ struct DetailPage: View {
     }
     
     private func saveRating() {
-        CKContainer.default().fetchUserRecordID { userRecordID, error in
+        guard let userEmail = UserDefaults.standard.string(forKey: "userEmail") else {
+            print("❌ لم يتم العثور على البريد الإلكتروني للمستخدم")
+            return
+        }
+
+        let record = CKRecord(recordType: "Rating")
+        record["placeID"] = place.id
+        record["rating"] = rating
+        record["userID"] = userEmail // ربط التقييم بالمستخدم
+
+        let database = CKContainer.default().privateCloudDatabase
+        database.save(record) { savedRecord, error in
             if let error = error {
-                print("❌ خطأ في جلب معرف المستخدم: \(error.localizedDescription)")
-                return
-            }
-
-            guard let userRecordID = userRecordID else {
-                print("❌ لم يتم العثور على معرف المستخدم")
-                return
-            }
-
-            let record = CKRecord(recordType: "Rating")
-            record["placeID"] = place.id
-            record["rating"] = rating
-            record["userID"] = userRecordID.recordName
-
-            let database = CKContainer.default().publicCloudDatabase
-            database.save(record) { savedRecord, error in
-                if let error = error {
-                    print("❌ خطأ في حفظ التقييم: \(error.localizedDescription)")
-                } else {
-                    print("✅ تم حفظ التقييم بنجاح!")
-                }
+                print("❌ خطأ في حفظ التقييم: \(error.localizedDescription)")
+            } else {
+                print("✅ تم حفظ التقييم بنجاح!")
             }
         }
     }
 
     private func fetchRating() {
-        let database = CKContainer.default().publicCloudDatabase
+        let database = CKContainer.default().privateCloudDatabase
         
         guard let placeID = place.id else {
             print("❌ place.id هو nil")
             return
         }
 
-        CKContainer.default().fetchUserRecordID { userRecordID, error in
+        guard let userEmail = UserDefaults.standard.string(forKey: "userEmail") else {
+            print("❌ لم يتم العثور على البريد الإلكتروني للمستخدم")
+            return
+        }
+
+        let predicate = NSPredicate(format: "placeID == %@ AND userID == %@", placeID, userEmail)
+        let query = CKQuery(recordType: "Rating", predicate: predicate)
+
+        database.perform(query, inZoneWith: nil) { records, error in
             if let error = error {
-                print("❌ خطأ في جلب معرف المستخدم: \(error.localizedDescription)")
+                print("❌ خطأ في استرجاع التقييم: \(error.localizedDescription)")
                 return
             }
 
-            guard let userRecordID = userRecordID else {
-                print("❌ لم يتم العثور على معرف المستخدم")
-                return
-            }
-
-            let predicate = NSPredicate(format: "placeID == %@ AND userID == %@", placeID, userRecordID.recordName)
-            let query = CKQuery(recordType: "Rating", predicate: predicate)
-
-            database.perform(query, inZoneWith: nil) { records, error in
-                if let error = error {
-                    print("❌ خطأ في استرجاع التقييم: \(error.localizedDescription)")
-                    return
+            if let record = records?.first, let fetchedRating = record["rating"] as? Int {
+                DispatchQueue.main.async {
+                    self.rating = fetchedRating
+                    print("✅ تم استرجاع التقييم: \(fetchedRating)")
                 }
-
-                if let record = records?.first, let fetchedRating = record["rating"] as? Int {
-                    DispatchQueue.main.async {
-                        self.rating = fetchedRating
-                        print("✅ تم استرجاع التقييم: \(fetchedRating)")
-                    }
-                } else {
-                    print("❌ لم يتم العثور على التقييم")
-                }
+            } else {
+                print("❌ لم يتم العثور على التقييم")
             }
         }
-    }
-}
+    }}
 
 // ✅ **تأثير BlurView لتطبيقه على الخلفيات**
 struct BlurView: UIViewRepresentable {
