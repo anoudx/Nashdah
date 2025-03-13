@@ -8,7 +8,7 @@ import SwiftUI
 import CloudKit
 
 
-
+//add comment
 struct Likes: View {
     @Binding var likedPlaces: [Place2] // Binding لقائمة الأماكن المفضلة
     @State private var heartStates: [String: Bool] = [:] // حالة الإعجاب لكل مكان
