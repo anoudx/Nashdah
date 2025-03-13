@@ -8,6 +8,8 @@ struct Location: Identifiable {
 }
 
 struct DetailPage: View {
+  
+
     let location = Location(coordinate: CLLocationCoordinate2D(latitude: 24.7136, longitude: 46.6753))
     @State private var rating = 0
     let place: Place2
@@ -18,7 +20,7 @@ struct DetailPage: View {
     )
     
     @Environment(\.dismiss) var dismiss
-
+    
     var body: some View {
         ScrollView {
             VStack {
@@ -95,12 +97,19 @@ struct DetailPage: View {
                     .frame(maxWidth: .infinity, alignment: .trailing)
                     .padding(.horizontal)
                     
-                    Map(coordinateRegion: $region, annotationItems: [Location(coordinate: CLLocationCoordinate2D(latitude: place.coordinate.latitude, longitude: place.coordinate.longitude))]) { location in
-                        MapPin(coordinate: location.coordinate, tint: Color("C1"))
+                
+                    
+                    // إضافة زر لفتح الموقع في خرائط آبل عند الضغط
+                    Button(action: {
+                        openInAppleMaps()
+                    }) {
+                        Map(coordinateRegion: $region, annotationItems: [Location(coordinate: CLLocationCoordinate2D(latitude: place.coordinate.latitude, longitude: place.coordinate.longitude))]) { location in
+                            MapPin(coordinate: location.coordinate, tint: Color("C1"))
+                        }
+                        .frame(height: 180)
+                        .cornerRadius(15)
+                        .padding(.horizontal)
                     }
-                    .frame(height: 180)
-                    .cornerRadius(15)
-                    .padding(.horizontal)
                 }
             }
         }
@@ -119,9 +128,21 @@ struct DetailPage: View {
                 .foregroundColor(Color("C1"))
         })
         
-        
+   
+    }
+    // دالة لفتح الموقع في خرائط آبل
+    func openInAppleMaps() {
+        let coordinates = CLLocationCoordinate2D(latitude: place.coordinate.latitude, longitude: place.coordinate.longitude)
+        let mapItem = MKMapItem(placemark: MKPlacemark(coordinate: coordinates))
+        mapItem.name = place.name
+        mapItem.openInMaps(launchOptions: [
+            MKLaunchOptionsDirectionsModeKey: MKLaunchOptionsDirectionsModeDriving
+        ])
     }
     
+
+
+  
     private func saveRating() {
         guard let userEmail = UserDefaults.standard.string(forKey: "userEmail") else {
             print("❌ لم يتم العثور على البريد الإلكتروني للمستخدم")
