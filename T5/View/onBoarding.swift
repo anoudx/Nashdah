@@ -3,7 +3,7 @@ import SwiftUI
 struct onBoarding: View {
     @State private var currentPage = 0
     @AppStorage("isFirstLaunch") private var isFirstLaunch: Bool = true
-    @State private var navigateToSignUp = false 
+    @State private var navigateToMainTabView = false
 
     let pages = [
         (" استكشف أماكن جديدة✨", "نساعدك في العثور على أفضل الوجهات في الرياض!", "mappin.and.ellipse"),
@@ -52,8 +52,16 @@ struct onBoarding: View {
                 
                 if currentPage == pages.count - 1 {
                     Button(action: {
-                        isFirstLaunch = false
-                        navigateToSignUp = true
+                        print("🟢 قبل التغيير - isFirstLaunch: \(UserDefaults.standard.bool(forKey: "isFirstLaunch"))")
+
+                        UserDefaults.standard.set(false, forKey: "isFirstLaunch") // ✅ تخزين القيمة
+                        UserDefaults.standard.synchronize() // ✅ تأكيد الحفظ فورًا
+
+                        print("🔴 بعد التغيير - isFirstLaunch: \(UserDefaults.standard.bool(forKey: "isFirstLaunch"))")
+
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                            navigateToMainTabView = true
+                        }
                     }) {
                         Text("ابدأ الآن")
                             .font(.headline)
@@ -62,33 +70,34 @@ struct onBoarding: View {
                             .background(Color("C1"))
                             .cornerRadius(10)
                     }
+
+
                     .padding(.bottom, 30)
                 }
             }
             .navigationBarBackButtonHidden(true)
             .interactiveDismissDisabled(true)
             .toolbar {
-              
                 if currentPage < pages.count - 1 {
                     ToolbarItem(placement: .navigationBarTrailing) {
                         Button("تخطي") {
                             isFirstLaunch = false
-                            navigateToSignUp = true
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                                navigateToMainTabView = true
+                            }
                         }
                         .foregroundColor(Color("C1"))
                         .padding(.trailing, 10)
                     }
                 }
             }
-            .navigationDestination(isPresented: $navigateToSignUp) {
-            Login()
+            .navigationDestination(isPresented: $navigateToMainTabView) {
+                MainTabView() // ✅ الانتقال إلى الصفحة الرئيسية بعد onBoarding
             }
         }
     }
 }
 
 #Preview {
-    NavigationStack {
-        onBoarding()
-    }
+    onBoarding()
 }

@@ -38,7 +38,7 @@ struct homescreenView: View {
                 Text("وجهات مختارة")
                 // .font(.title)
                     .foregroundColor(Color("C1"))
-                    .font(.custom("SFPro", size: 23))
+                    .font(.custom("SFPro", size: 20))
                     .padding(.trailing,258)
                 //  .padding(.top,15)
                     .padding(.top, 18)

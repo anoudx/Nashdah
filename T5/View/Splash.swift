@@ -1,10 +1,3 @@
-//
-//  Splash.swift
-//  T5
-//
-//  Created by Noura Alrowais on 03/09/1446 AH.
-//
-
 import SwiftUI
 
 struct SplashView: View {
@@ -38,20 +31,27 @@ struct SplashView: View {
                 }
             }
             .onAppear {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 3) {                     withAnimation {
+                // ✅ التأكد من ضبط `isFirstLaunch` فقط إذا لم يكن قد تم ضبطه من قبل
+                if UserDefaults.standard.object(forKey: "isFirstLaunch") == nil {
+                    UserDefaults.standard.set(true, forKey: "isFirstLaunch")
+                    UserDefaults.standard.synchronize()
+                    print("🔄 تم ضبط isFirstLaunch لأول مرة: \(UserDefaults.standard.bool(forKey: "isFirstLaunch"))")
+                }
+
+                DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+                    withAnimation {
                         isActive = true
                     }
                 }
             }
             .navigationDestination(isPresented: $isActive) {
-                onBoarding()
-                    .transition(.opacity)
+                if UserDefaults.standard.bool(forKey: "isFirstLaunch") {
+                    onBoarding()
+                } else {
+                    MainTabView()
+                }
             }
         }
         .navigationBarBackButtonHidden(true)
     }
-}
-
-#Preview {
-    SplashView()
 }

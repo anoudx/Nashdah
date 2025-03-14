@@ -1,42 +1,24 @@
-//
-//  ContentView.swift
-//  T5
-//
-//  Created by Alanoud Alamrani on 28/08/1446 AH.
-//
-
 import SwiftUI
 
 struct ContentView: View {
+    @State private var isFirstLaunch = UserDefaults.standard.bool(forKey: "isFirstLaunch")
+    @State private var shouldNavigate = false
+
     var body: some View {
-        TabView {
-            homescreenView()
-                .tabItem {
-                    Image(systemName: "house.fill")
-                    Text("الرئيسية")
-                }
-            
-            foryou()
-                .tabItem {
-                    Image("Image")
-                     .resizable()
-//                        .renderingMode(.template)
-                        .frame(width: 22, height: 22)
-                    Text("توصيات لك")
-                }
-            
-            Profile()
-                .tabItem {
-           Image(systemName: "person.fill")
-                    Text("الحساب")
-                }
-
+        NavigationStack {
+            if shouldNavigate {
+                MainTabView() // ✅ سيتم التنقل إلى `MainTabView` إذا كان `isFirstLaunch = false`
+            } else {
+                onBoarding()
+            }
         }
-
-        .accentColor(Color("C1")).navigationBarBackButtonHidden(true)
+        .onAppear {
+            print("🔄 ContentView ظهر - isFirstLaunch: \(isFirstLaunch)")
+            if !isFirstLaunch {
+                DispatchQueue.main.async {
+                    shouldNavigate = true // ✅ إجبار التنقل إلى `MainTabView`
+                }
+            }
+        }
     }
 }
-
-#Preview {
-   ContentView()
-    }
