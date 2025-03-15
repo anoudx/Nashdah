@@ -5,7 +5,6 @@
 //  Created by Abeer on 03/09/1446 AH.
 //
 
-
 import SwiftUI
 import CloudKit
 
@@ -104,6 +103,7 @@ struct Profile: View {
         }
         .onAppear {
        fetchUserData() // تحميل بيانات المستخدم عند الدخول للملف الشخصي
+//            region.center = CLLocationCoordinate2D(latitude: place.coordinate.latitude, longitude: place.coordinate.longitude)
 
         }
         .fullScreenCover(isPresented: .constant(!isLoggedIn)) { // ✅ إذا لم يكن مسجلًا، انتقل إلى `LoginView`
@@ -209,19 +209,21 @@ struct Profile: View {
                     }
                     
                     .padding()
-                    .frame(width: 322, height:52)
-                    .overlay(
-                        RoundedRectangle(cornerRadius:10)
-                            .stroke(Color("C2"), lineWidth: 1.5))
-                    
+//                    .frame(width: 322, height:52)
+//                    .overlay(
+//                        RoundedRectangle(cornerRadius:10)
+//                            .stroke(Color("C2"), lineWidth: 1.5))
+//
                 }
                 
                 if isExpanded {
-                                Text(content)
-                                    .font(.custom("SFPro", size: 16))
-                                    .multilineTextAlignment(.trailing)
-                                    .padding(.horizontal)
-                                .padding(.bottom,10)}}
+                    Text(content)
+                        .font(.custom("SFPro", size: 16))
+                        .multilineTextAlignment(.trailing)
+                        .padding(.horizontal)
+                        .padding(.bottom,10)
+                        .frame(height:120)
+                }}
                                 .foregroundColor(.gray)
 
                                     .frame(width:322)
