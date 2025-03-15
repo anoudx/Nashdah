@@ -207,7 +207,8 @@ struct FeatureCard: View {
              
                 VStack(alignment: .trailing) {
                     Text(Title)
-                        .font(.custom("SFPro", size: 20))
+//                        .font(.custom("SFPro", size: 20))
+                        .bold()
                         .foregroundColor(.white)
                         .bold()
                         .shadow(radius: 3)
