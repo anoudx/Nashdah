@@ -24,10 +24,13 @@ struct UserRecommendations: View {
                 VStack(alignment: .leading, spacing: 30) {
                     Text("اخبرنا عن اهتماماتك لنقترح لك وجهاتك المثالية !")
                         .multilineTextAlignment(.center)
+                        .font(.custom("SFPro", size: 23))
+//                        .bold()
                         .frame(maxWidth: .infinity)
                         .padding(.horizontal, 40)
                         .padding(.top, 20)
-                    
+                        .padding(.bottom, 20)
+
                     VStack(spacing: 15) {
                         ForEach(interests, id: \.self) { row in
                             HStack(spacing: 25) {
@@ -78,7 +81,7 @@ struct CircleButton: View {
     var body: some View {
         Button(action: action) {
             Text(interest.name)
-                .font(.system(size: 18, weight: .medium))
+                .font(.system(size: 14, weight: .medium))
                 .foregroundColor(isSelected ? .white : .black)
                 .frame(width: 100, height: 100)
                 .background(isSelected ? Color("C1") : Color.gray.opacity(0.2))
